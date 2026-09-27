@@ -103,7 +103,6 @@
         }
         .desk-pc { width: 50px; height: 30px; background: #0a0d14; border-radius: 5px; border: 2px solid #55627d; }
 
-        /* ВЕКТОРНАЯ ОЧЕРЕДЬ (ЧИНИТ СЕРЫЕ КВАДРАТЫ) */
         .queue-line {
             position: absolute; bottom: 35px; right: 20px; display: flex; gap: 8px; z-index: 4; opacity: 0.6;
         }
@@ -111,7 +110,6 @@
             width: 28px; height: 35px; fill: #94a3b8;
         }
 
-        /* ПАЦИЕНТ И НАСТРОЕНИЕ (ПОДНЯТ ВЫШЕ СТОЙКИ) */
         .patient-container {
             position: absolute; bottom: 70px; left: -120px; z-index: 5;
             display: flex; flex-direction: column; align-items: center;
@@ -163,7 +161,6 @@
 
         .zen-effect { background: linear-gradient(180deg, #2d2342 0%, #1d2b45 100%); }
 
-        /* ИНТЕРФЕЙС ТАЙМЕРА И ДИАЛОГА */
         .timer-bar {
             height: 6px; background: var(--danger); width: 100%; margin-bottom: 10px;
             border-radius: 3px; transform-origin: left; display: none;
@@ -177,7 +174,6 @@
         .dialogue-card h4 { color: var(--primary-light); margin-bottom: 6px; font-size: 0.95rem; text-transform: uppercase; letter-spacing: 1px; }
         .dialogue-card p { font-size: 1.05rem; line-height: 1.5; font-weight: 500; }
 
-        /* WHATSAPP ИНТЕРФЕЙС */
         .whatsapp-box {
             background: #0b141a; border-radius: 15px; padding: 15px; margin-bottom: 15px;
             border: 1px solid #222d34; display: none;
@@ -193,7 +189,6 @@
         }
         .choice-btn:hover { border-color: var(--primary-light); background: #2e364a; transform: translateX(4px); }
 
-        /* ФИДБЕК МОДАЛКА */
         #feedback-modal {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(0,0,0,0.8); display: none; justify-content: center; align-items: center; z-index: 1000;
@@ -252,7 +247,6 @@
             <div class="progress-bar"><div class="progress-fill" id="progress-fill"></div></div>
             <p style="text-align: right; color: #94a3b8; margin-bottom: 8px; font-weight: 800; font-size: 0.85rem;" id="question-counter">Ситуация 1 / 15</p>
 
-            <!-- 3D ИЗОМЕТРИЧЕСКАЯ КОМНАТА -->
             <div class="viewport-3d" id="clinic-env">
                 <div class="room-wall">
                     <div class="wall-decor">
@@ -262,13 +256,11 @@
                 </div>
                 <div class="room-floor"></div>
 
-                <!-- ОЧЕРЕДЬ (SVG ИКОНКИ ВМЕСТО ЭМОДЗИ) -->
                 <div class="queue-line">
                     <svg class="queue-person-icon" viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
                     <svg class="queue-person-icon" viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
                 </div>
 
-                <!-- ПАЦИЕНТ -->
                 <div class="patient-container" id="patient-box">
                     <div class="status-float" id="status-float"></div>
                     <div class="patience-bar-wrap"><div class="patience-fill" id="patience-fill"></div></div>
@@ -282,7 +274,6 @@
 
             <div class="timer-bar" id="timer-bar"></div>
 
-            <!-- WHATSAPP ОКНО -->
             <div class="whatsapp-box" id="whatsapp-box">
                 <div class="wa-header">
                     <span style="font-size: 1.2rem;">📱</span>
@@ -294,7 +285,6 @@
                 <div class="wa-bubble" id="wa-text">...</div>
             </div>
 
-            <!-- СТАНДАРТНЫЙ ДИАЛОГ -->
             <div class="dialogue-card" id="dialogue-card">
                 <h4 id="patient-name">Пациент</h4>
                 <p id="patient-dialogue">Текст пациента...</p>
@@ -315,7 +305,6 @@
         </div>
     </div>
 
-    <!-- МОДАЛЬНОЕ ОКНО ФИДБЕКА -->
     <div id="feedback-modal">
         <div class="feedback-content">
             <div class="badge-icon" id="fb-icon">✅</div>
@@ -421,15 +410,16 @@
                     { text: { ru: 'Ладно, идите без очереди.', kz: 'Жарайды, кезексіз өтіңіз.' }, isCorrect: false, feedbackTitle: { ru: '❌ Нарушение', kz: '❌ Ережені бұзу' }, feedbackDesc: { ru: 'Остальная очередь устроит бунт.', kz: 'Басқа кезектегілер ашуланады.' } }
                 ]
             },
+            // ОБНОВЛЕННЫЙ СЦЕНАРИЙ 3: АНКЕТА И ДИСК
             {
                 type: 'paperwork', avatar: '📝',
-                name: { ru: 'Мария (Анкета)', kz: 'Мария (Сауалнама)' },
-                dialogue: { ru: 'Зачем мне заполнять анкету? Я просто снимок хочу сделать!', kz: 'Сауалнаманы не үшін толтырамын? Мен тек суретке түсемін!' },
+                name: { ru: 'Мария (Анкета и направление)', kz: 'Мария (Сауалнама)' },
+                dialogue: { ru: 'Зачем мне заполнять анкету и направление? Вы же просто диагностический центр и не лечение проводите!', kz: 'Сауалнама мен жолдаманы не үшін толтырамын? Сіздер емдемейсіздер, тек диагностика жасайсыздар ғой!' },
                 choices: [
-                    { text: { ru: 'Без бумаг мы вас не примем.', kz: 'Қағазсыз қабылдамаймыз.' }, isCorrect: false, feedbackTitle: { ru: '❌ Бюрократия', kz: '❌ Төрешілдік' }, feedbackDesc: { ru: 'Отсылка к правилам бесит клиентов.', kz: 'Ережеге сілтеме жасау ашу тудырады.' } },
-                    { text: { ru: 'Анкета нужна для учета аллергий, а согласие — требование Минздрава для вашей безопасности. Давайте помогу!', kz: 'Сауалнама аллергияны ескеру үшін, ал келісім — қауіпсіздігіңіз үшін Министрлік талабы. Көмектесейін!' }, isCorrect: true, feedbackTitle: { ru: '🌟 Аргументация', kz: '🌟 Уәжді аргумент' }, feedbackDesc: { ru: 'Объяснили ВЫГОДУ для пациента.', kz: 'Пациент үшін ПАЙДАСЫН түсіндірдіңіз.' } },
-                    { text: { ru: 'Ну ладно, просто распишитесь внизу.', kz: 'Жарайды, тек төменге қол қойыңыз.' }, isCorrect: false, feedbackTitle: { ru: '❌ Нарушение', kz: '❌ Бұзушылық' }, feedbackDesc: { ru: 'Юридический риск для клиники.', kz: 'Заңды тәуекел.' } },
-                    { text: { ru: 'Позову врача, пусть сам объясняет.', kz: 'Дәрігерді шақырайын, өзі түсіндірсін.' }, isCorrect: false, feedbackTitle: { ru: '❌ Перекладывание', kz: '❌ Жауапкершіліктен қашу' }, feedbackDesc: { ru: 'Оформление — работа админа.', kz: 'Рәсімдеу — әкімшінің жұмысы.' } }
+                    { text: { ru: 'Без бумаг мы вас не примем, у нас такие правила.', kz: 'Қағазсыз қабылдамаймыз, бізде осындай ереже.' }, isCorrect: false, feedbackTitle: { ru: '❌ Бюрократия', kz: '❌ Төрешілдік' }, feedbackDesc: { ru: 'Отсылка к формальным правилам раздражает пациента.', kz: 'Ережеге сілтеме жасау ашу тудырады.' } },
+                    { text: { ru: 'Данные нужны, чтобы мы точно подписали конверт с вашим диском и правильно отправили снимки вашему лечащему врачу в клинику!', kz: 'Деректер дискіңіз бар конвертті дәл қол қойып, суреттерді емдеуші дәрігеріңізге клиникаға қатесіз жіберу үшін қажет!' }, isCorrect: true, feedbackTitle: { ru: '🌟 Точный регламент', kz: '🌟 Нақты хаттама' }, feedbackDesc: { ru: 'Вы четко объяснили суть: анкета нужна для подписи конверта и отправки диска лечащему врачу!', kz: 'Сауалнама конвертке қол қою және дискіні дәрігерге жіберу үшін қажет екенін нақты түсіндірдіңіз!' } },
+                    { text: { ru: 'Ну ладно, не пишите, просто снимок сделаем.', kz: 'Жарайды, жазбаңыз, тек суретке түсірейік.' }, isCorrect: false, feedbackTitle: { ru: '❌ Ошибка в данных', kz: '❌ Деректер қатесі' }, feedbackDesc: { ru: 'Без данных вы не сможете правильно подписать конверт и отправить результаты врачу.', kz: 'Дерексіз конвертке қол қойып, нәтижені дәрігерге жібере алмайсыз.' } },
+                    { text: { ru: 'Анкета нужна, чтобы врач учел аллергии и план лечения.', kz: 'Сауалнама дәрігер емдеу жоспары мен аллергияны ескеруі үшін қажет.' }, isCorrect: false, feedbackTitle: { ru: '❌ Неверно для 3D Dental', kz: '❌ 3D Dental үшін қате' }, feedbackDesc: { ru: '3D Dental — диагностический центр, вы не проводите лечение. Данные нужны для подписи конверта и отправки в клинику!', kz: '3D Dental — диагностикалық орталық, сіздер емдемейсіздер. Деректер конвертке қол қою және клиникаға жіберу үшін қажет!' } }
                 ]
             },
             {
@@ -558,7 +548,7 @@
                 name: { ru: 'Дмитрий (Финал)', kz: 'Дмитрий (Финал)' },
                 dialogue: { ru: 'Спасибо, снимок сделали! А где забрать результаты?', kz: 'Рахмет, суретті түсірдік! Нәтижені қайдан аламын?' },
                 choices: [
-                    { text: { ru: 'Вот диск. Пока.', kz: 'Міне диск. Сау бол.' }, isCorrect: false, feedbackTitle: { ru: '❌ Сухо', kz: '❌ Құрғақ' }, feedbackDesc: { ru: 'Забыли про 2ГИС.', kz: '2ГИС ұмыт қалды.' } },
+                    { text: { ru: 'Вот ваш диск. Пока.', kz: 'Міне диск. Сау бол.' }, isCorrect: false, feedbackTitle: { ru: '❌ Сухо', kz: '❌ Құрғақ' }, feedbackDesc: { ru: 'Забыли про 2ГИС.', kz: '2ГИС ұмыт қалды.' } },
                     { text: { ru: 'Ваш диск готов! Спасибо за визит. Если вам понравился сервис, будем очень благодарны за отзыв в 2ГИС! До свидания!', kz: 'Дискіңіз дайын! Келгеніңізге рахмет. Қызмет ұнаса, 2ГИС-те пікір қалдырсаңыз риза боламыз!' }, isCorrect: true, feedbackTitle: { ru: '🌟 5 Звезд в 2ГИС', kz: '🌟 2ГИС-те 5 жұлдыз' }, feedbackDesc: { ru: 'Вежливый сбор 5-звездочных отзывов перекрывает весь негатив!', kz: 'Жақсы пікірлер жинау жағымсыз пиғылды жабады!' } },
                     { text: { ru: 'Напишите 5 звезд, а то шеф уволит.', kz: '5 жұлдыз қойыңызшы, әйтпесе бастық қуады.' }, isCorrect: false, feedbackTitle: { ru: '❌ Жалость', kz: '❌ Аяныш' }, feedbackDesc: { ru: 'Выпрашивание отзыва.', kz: 'Пікірді жалынып сұрау.' } },
                     { text: { ru: 'Молча отдать диск.', kz: 'Үндемей бере салу.' }, isCorrect: false, feedbackTitle: { ru: '❌ Невежливо', kz: '❌ Сыпайы емес' }, feedbackDesc: { ru: 'Смазанное впечатление.', kz: 'Нашар әсер.' } }
