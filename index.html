@@ -70,7 +70,7 @@
         }
 
         .room-wall {
-            position: absolute; width: 100%; height: 65%; top: 0;
+            position: absolute; width: 100%; height: 60%; top: 0;
             background: linear-gradient(180deg, #1e2433 0%, #2b3346 100%);
             border-bottom: 4px solid #141824;
         }
@@ -87,51 +87,55 @@
             transform-origin: bottom; transform: rotate(45deg);
         }
 
-        .signboard { height: 50px; object-fit: contain; filter: drop-shadow(0 3px 6px rgba(0,0,0,0.6)); }
+        .signboard { height: 45px; object-fit: contain; filter: drop-shadow(0 3px 6px rgba(0,0,0,0.6)); }
 
         .room-floor {
-            position: absolute; width: 100%; height: 35%; bottom: 0;
+            position: absolute; width: 100%; height: 40%; bottom: 0;
             background: repeating-linear-gradient(90deg, #3d465c, #3d465c 40px, #353f53 40px, #353f53 80px);
         }
 
         .reception-desk {
             position: absolute; bottom: 0; left: 50%; transform: translateX(-50%);
-            width: 75%; height: 95px; background: linear-gradient(180deg, #2e364a 0%, #1c222e 100%);
-            border-radius: 15px 15px 0 0; border-top: 6px solid var(--primary-light);
+            width: 75%; height: 80px; background: linear-gradient(180deg, #2e364a 0%, #1c222e 100%);
+            border-radius: 15px 15px 0 0; border-top: 5px solid var(--primary-light);
             box-shadow: 0 -8px 25px rgba(0,0,0,0.5); z-index: 10;
             display: flex; justify-content: center; align-items: center;
         }
-        .desk-pc { width: 50px; height: 35px; background: #0a0d14; border-radius: 5px; border: 2px solid #55627d; }
+        .desk-pc { width: 50px; height: 30px; background: #0a0d14; border-radius: 5px; border: 2px solid #55627d; }
 
-        /* ОЧЕРЕДЬ СИЛУЭТОВ */
+        /* ВЕКТОРНАЯ ОЧЕРЕДЬ (ЧИНИТ СЕРЫЕ КВАДРАТЫ) */
         .queue-line {
-            position: absolute; bottom: 40px; right: 15px; display: flex; gap: -10px; z-index: 4; opacity: 0.5;
+            position: absolute; bottom: 35px; right: 20px; display: flex; gap: 8px; z-index: 4; opacity: 0.6;
         }
-        .queue-person { font-size: 2.2rem; filter: grayscale(1); }
+        .queue-person-icon {
+            width: 28px; height: 35px; fill: #94a3b8;
+        }
 
-        /* ПАЦИЕНТ И НАСТРОЕНИЕ */
+        /* ПАЦИЕНТ И НАСТРОЕНИЕ (ПОДНЯТ ВЫШЕ СТОЙКИ) */
         .patient-container {
-            position: absolute; bottom: 35px; left: -120px; z-index: 6;
+            position: absolute; bottom: 70px; left: -120px; z-index: 5;
             display: flex; flex-direction: column; align-items: center;
             transition: left 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
         .patient-container.walk-in { left: 50%; transform: translateX(-50%); }
 
         .patience-bar-wrap {
-            width: 80px; height: 8px; background: rgba(0,0,0,0.6); border-radius: 10px;
-            overflow: hidden; border: 1px solid #fff; margin-bottom: 5px;
+            width: 90px; height: 8px; background: rgba(0,0,0,0.6); border-radius: 10px;
+            overflow: hidden; border: 1px solid #fff; margin-bottom: 8px;
         }
         .patience-fill { height: 100%; width: 100%; background: var(--success); transition: width 0.4s, background 0.4s; }
 
         .patient-character {
-            font-size: 4.8rem; filter: drop-shadow(0 10px 15px rgba(0,0,0,0.6));
-            font-family: "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji", sans-serif;
+            font-size: 5rem; line-height: 1;
+            filter: drop-shadow(0 10px 15px rgba(0,0,0,0.6));
+            font-family: "Segoe UI Emoji", "Apple Color Emoji", "Noto Color Emoji", sans-serif;
             transition: transform 0.2s;
         }
 
         .status-float {
-            position: absolute; top: -30px; font-weight: 900; font-size: 1.1rem;
+            position: absolute; top: -35px; font-weight: 900; font-size: 1.1rem;
             opacity: 0; transform: translateY(0); transition: all 0.6s ease-out; pointer-events: none;
+            white-space: nowrap;
         }
         .status-float.show { opacity: 1; transform: translateY(-20px); }
 
@@ -173,7 +177,7 @@
         .dialogue-card h4 { color: var(--primary-light); margin-bottom: 6px; font-size: 0.95rem; text-transform: uppercase; letter-spacing: 1px; }
         .dialogue-card p { font-size: 1.05rem; line-height: 1.5; font-weight: 500; }
 
-        /* WHATSAPP ИНТЕРФЕЙС (СИТУАЦИЯ 8) */
+        /* WHATSAPP ИНТЕРФЕЙС */
         .whatsapp-box {
             background: #0b141a; border-radius: 15px; padding: 15px; margin-bottom: 15px;
             border: 1px solid #222d34; display: none;
@@ -189,7 +193,7 @@
         }
         .choice-btn:hover { border-color: var(--primary-light); background: #2e364a; transform: translateX(4px); }
 
-        /* ФИДБЕК МОДАЛКА С ИНФОГРАФИКОЙ */
+        /* ФИДБЕК МОДАЛКА */
         #feedback-modal {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(0,0,0,0.8); display: none; justify-content: center; align-items: center; z-index: 1000;
@@ -258,10 +262,10 @@
                 </div>
                 <div class="room-floor"></div>
 
-                <!-- ОЧЕРЕДЬ -->
+                <!-- ОЧЕРЕДЬ (SVG ИКОНКИ ВМЕСТО ЭМОДЗИ) -->
                 <div class="queue-line">
-                    <span class="queue-person">👨‍💼</span>
-                    <span class="queue-person">👩‍🦰</span>
+                    <svg class="queue-person-icon" viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+                    <svg class="queue-person-icon" viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
                 </div>
 
                 <!-- ПАЦИЕНТ -->
@@ -278,7 +282,7 @@
 
             <div class="timer-bar" id="timer-bar"></div>
 
-            <!-- WHATSAPP ОКНО (ДЛЯ СИТУАЦИИ 8) -->
+            <!-- WHATSAPP ОКНО -->
             <div class="whatsapp-box" id="whatsapp-box">
                 <div class="wa-header">
                     <span style="font-size: 1.2rem;">📱</span>
@@ -322,10 +326,8 @@
     </div>
 
     <script>
-        // === ССЫЛКА GOOGLE APPS SCRIPT ===
         const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwpzgXfOuCY9mWe1eLcKd5UKcl79U7lfnvj2Omj9TuQcP5gWthAU6gXXTYwgMsGyhp4tQ/exec';
 
-        // --- WEB AUDIO API ДВИЖОК (ЗВУКИ БЕЗ ВНЕШНИХ ФАЙЛОВ) ---
         const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
         
         function playSound(type) {
@@ -341,8 +343,8 @@
                 gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.1);
                 osc.start(); osc.stop(audioCtx.currentTime + 0.1);
             } else if (type === 'success') {
-                osc.type = 'sine'; osc.frequency.setValueAtTime(523.25, audioCtx.currentTime); // C5
-                osc.frequency.setValueAtTime(659.25, audioCtx.currentTime + 0.1); // E5
+                osc.type = 'sine'; osc.frequency.setValueAtTime(523.25, audioCtx.currentTime);
+                osc.frequency.setValueAtTime(659.25, audioCtx.currentTime + 0.1);
                 gain.gain.setValueAtTime(0.15, audioCtx.currentTime);
                 gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.3);
                 osc.start(); osc.stop(audioCtx.currentTime + 0.3);
@@ -366,7 +368,7 @@
         const UI = {
             ru: {
                 welcome: "Добро пожаловать на смену!",
-                loginDesc: "Пройдите симуляцию 15 рабочих ситуаций.",
+                loginDesc: "Пройдите интерактивный тренажер из 15 рабочих ситуаций.",
                 placeholder: "Введите ваше ФИО",
                 startBtn: "Заступить на смену 🚀",
                 error: "Введите ФИО!",
@@ -397,7 +399,6 @@
         };
 
         const scenarios = [
-            // 1
             {
                 type: 'normal', avatar: '👩',
                 name: { ru: 'Светлана (Первичный пациент)', kz: 'Светлана (Жаңа пациент)' },
@@ -409,7 +410,6 @@
                     { text: { ru: 'КТ стоит 15 600 тенге, живая очередь.', kz: 'КТ 15 600 теңге, тірі кезек.' }, isCorrect: false, feedbackTitle: { ru: '❌ Сухой ответ', kz: '❌ Құрғақ жауап' }, feedbackDesc: { ru: 'Нет приветствия и заботы.', kz: 'Сәлемдесу мен қамқорлық жоқ.' } }
                 ]
             },
-            // 2
             {
                 type: 'rushed', avatar: '🏃‍♂️',
                 name: { ru: 'Ерлан (Спешит)', kz: 'Ерлан (Асығыс)' },
@@ -421,7 +421,6 @@
                     { text: { ru: 'Ладно, идите без очереди.', kz: 'Жарайды, кезексіз өтіңіз.' }, isCorrect: false, feedbackTitle: { ru: '❌ Нарушение', kz: '❌ Ережені бұзу' }, feedbackDesc: { ru: 'Остальная очередь устроит бунт.', kz: 'Басқа кезектегілер ашуланады.' } }
                 ]
             },
-            // 3
             {
                 type: 'paperwork', avatar: '📝',
                 name: { ru: 'Мария (Анкета)', kz: 'Мария (Сауалнама)' },
@@ -433,7 +432,6 @@
                     { text: { ru: 'Позову врача, пусть сам объясняет.', kz: 'Дәрігерді шақырайын, өзі түсіндірсін.' }, isCorrect: false, feedbackTitle: { ru: '❌ Перекладывание', kz: '❌ Жауапкершіліктен қашу' }, feedbackDesc: { ru: 'Оформление — работа админа.', kz: 'Рәсімдеу — әкімшінің жұмысы.' } }
                 ]
             },
-            // 4
             {
                 type: 'conflict', avatar: '😠',
                 name: { ru: 'Айнур (Конфликт)', kz: 'Айнур (Жанжал)' },
@@ -445,7 +443,6 @@
                     { text: { ru: 'Идите в другую клинику, если не нравится.', kz: 'Ұнамаса басқа клиникаға барыңыз.' }, isCorrect: false, feedbackTitle: { ru: '❌ Увольнение', kz: '❌ Жұмыстан босату' }, feedbackDesc: { ru: 'Недопустимая грубость.', kz: 'Мүлдем жол берілмейді.' } }
                 ]
             },
-            // 5
             {
                 type: 'child', avatar: '👶',
                 name: { ru: 'Динара (Мама с ребенком)', kz: 'Динара (Баласы бар ана)' },
@@ -457,7 +454,6 @@
                     { text: { ru: 'Пусть сам заходит, он уже большой.', kz: 'Өзі кірсін, үлкен бала ғой.' }, isCorrect: false, feedbackTitle: { ru: '❌ Черствость', kz: '❌ Тасбауырлық' }, feedbackDesc: { ru: 'Ребенок сорвет снимок.', kz: 'Бала суретті бүлдіреді.' } }
                 ]
             },
-            // 6
             {
                 type: 'fear', avatar: '😰',
                 name: { ru: 'Игорь (Страх радиации)', kz: 'Игорь (Радиациядан қорқу)' },
@@ -469,7 +465,6 @@
                     { text: { ru: 'Молча включить аппарат.', kz: 'Үндемей аппаратты қосу.' }, isCorrect: false, feedbackTitle: { ru: '❌ Игнор', kz: '❌ Елемеу' }, feedbackDesc: { ru: 'Усиливает панику.', kz: 'Үрейді күшейтеді.' } }
                 ]
             },
-            // 7
             {
                 type: 'intoxicated', avatar: '🥴',
                 name: { ru: 'Пациент (Опьянение)', kz: 'Пациент (Мас)' },
@@ -481,7 +476,6 @@
                     { text: { ru: 'Сделать за двойную цену.', kz: 'Екі есе бағаға түсіру.' }, isCorrect: false, feedbackTitle: { ru: '❌ Преступление', kz: '❌ Қылмыс' }, feedbackDesc: { ru: 'Вымогательство.', kz: 'Заңсыз ақша талап ету.' } }
                 ]
             },
-            // 8
             {
                 type: 'chat', avatar: '📱',
                 name: { ru: 'WhatsApp Чат', kz: 'WhatsApp Чат' },
@@ -493,7 +487,6 @@
                     { text: { ru: 'Игнорировать сообщение.', kz: 'Жауап бермеу.' }, isCorrect: false, feedbackTitle: { ru: '❌ Игнор', kz: '❌ Елемеу' }, feedbackDesc: { ru: 'Слив лида.', kz: 'Клиентті жоғалту.' } }
                 ]
             },
-            // 9
             {
                 type: 'earthquake', avatar: '🚨', timer: 15,
                 name: { ru: '🚨 ЧС: ЗЕМЛЕТРЯСЕНИЕ!', kz: '🚨 ТЖ: ЖЕР СІЛКІНІСІ!' },
@@ -505,7 +498,6 @@
                     { text: { ru: 'Паниковать и кричать.', kz: 'Дүрбелеңге түсу.' }, isCorrect: false, feedbackTitle: { ru: '❌ Паника', kz: '❌ Дүрбелең' }, feedbackDesc: { ru: 'Паника убивает.', kz: 'Дүрбелең өмірге қауіпті.' } }
                 ]
             },
-            // 10
             {
                 type: 'fire', avatar: '🔥', timer: 15,
                 name: { ru: '🔥 ЧС: ПОЖАРНАЯ ТРЕВОГА!', kz: '🔥 ТЖ: ӨРТ ДАБЫЛЫ!' },
@@ -517,7 +509,6 @@
                     { text: { ru: 'Включить вентилятор.', kz: 'Желдеткішті қосу.' }, isCorrect: false, feedbackTitle: { ru: '❌ Абсурд', kz: '❌ Сандырақ' }, feedbackDesc: { ru: 'Воздух раздует пламя.', kz: 'Ауа өртті күшейтеді.' } }
                 ]
             },
-            // 11
             {
                 type: 'medical', avatar: '😵', timer: 15,
                 name: { ru: '🚑 НЕОТЛОЖКА: ОБМОРОК', kz: '🚑 ЖЕДЕЛ КӨМЕК: ТАЛЫП ҚАЛУ' },
@@ -529,7 +520,6 @@
                     { text: { ru: 'Убежать за врачом.', kz: 'Дәрігерге қашып кету.' }, isCorrect: false, feedbackTitle: { ru: '❌ Бросили', kz: '❌ Қалдырып кету' }, feedbackDesc: { ru: 'Нельзя оставлять без присмотра.', kz: 'Жалғыз қалдыруға болмайды.' } }
                 ]
             },
-            // 12
             {
                 type: 'medical', avatar: '💔', timer: 15,
                 name: { ru: '🚑 НЕОТЛОЖКА: ОСТАНОВКА СЕРДЦА', kz: '🚑 ЖЕДЕЛ КӨМЕК: ЖҮРЕК ТОҚТАУЫ' },
@@ -541,7 +531,6 @@
                     { text: { ru: 'Дать понюхать спирт.', kz: 'Спирт иіскету.' }, isCorrect: false, feedbackTitle: { ru: '❌ Бесполезно', kz: '❌ Пайдасыз' }, feedbackDesc: { ru: 'При остановке сердца это не работает.', kz: 'Бұл жүректі іске қоспайды.' } }
                 ]
             },
-            // 13
             {
                 type: 'zen', avatar: '🤬',
                 name: { ru: 'Психология: Хамство', kz: 'Психология: Дөрекілік' },
@@ -553,7 +542,6 @@
                     { text: { ru: 'Вызвать драку.', kz: 'Төбелес шығару.' }, isCorrect: false, feedbackTitle: { ru: '❌ Криминал', kz: '❌ Қылмыс' }, feedbackDesc: { ru: 'Увольнение.', kz: 'Жұмыстан босату.' } }
                 ]
             },
-            // 14
             {
                 type: 'zen', avatar: '🧘‍♀️',
                 name: { ru: 'Психология: Конец смены', kz: 'Психология: Ауысым соңы' },
@@ -565,7 +553,6 @@
                     { text: { ru: 'Написать злой пост в соцсетях.', kz: 'Желіде ашулы пост жазу.' }, isCorrect: false, feedbackTitle: { ru: '❌ Штраф', kz: '❌ Айыппұл' }, feedbackDesc: { ru: 'Нарушение корпоративной этики.', kz: 'Корпоративтік этиканы бұзу.' } }
                 ]
             },
-            // 15
             {
                 type: 'post', avatar: '🙂',
                 name: { ru: 'Дмитрий (Финал)', kz: 'Дмитрий (Финал)' },
@@ -627,14 +614,12 @@
             const patienceFill = document.getElementById('patience-fill');
             const timerBar = document.getElementById('timer-bar');
             
-            // Сброс окружения
             env.className = 'viewport-3d';
             if (sc.type === 'earthquake') env.classList.add('shake-effect');
             if (sc.type === 'fire') env.classList.add('fire-effect');
             if (sc.type === 'medical') env.classList.add('medical-effect');
             if (sc.type === 'zen') env.classList.add('zen-effect');
 
-            // Анимация входа пациента + Звук шага
             patientBox.classList.remove('walk-in');
             patienceFill.style.width = '100%';
             patienceFill.style.background = 'var(--success)';
@@ -645,7 +630,6 @@
                 playSound('step');
             }, 100);
 
-            // Таймер для экстремальных ситуаций
             if (sc.timer) {
                 timerBar.style.display = 'block';
                 timerBar.style.transform = 'scaleX(1)';
@@ -663,11 +647,9 @@
                 timerBar.style.display = 'none';
             }
 
-            // Настройка UI
             document.getElementById('question-counter').innerText = `${UI[lang].sit} ${currentStep + 1} / ${scenarios.length}`;
             document.getElementById('progress-fill').style.width = `${((currentStep) / scenarios.length) * 100}%`;
 
-            // Режим WhatsApp
             const waBox = document.getElementById('whatsapp-box');
             const dialogueCard = document.getElementById('dialogue-card');
             
@@ -682,7 +664,6 @@
                 document.getElementById('patient-dialogue').innerText = sc.dialogue[lang];
             }
 
-            // Генерация вариантов
             const choicesContainer = document.getElementById('choices-container');
             choicesContainer.innerHTML = '';
             
