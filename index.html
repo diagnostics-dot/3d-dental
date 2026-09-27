@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Тренажер 3D Dental | Экзамен</title>
+    <title>3D Dental | Интерактивный Симулятор</title>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;800&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -11,7 +11,7 @@
             --primary-light: #007bff;
             --success: #28a745;
             --danger: #dc3545;
-            --bg: #f4f7f6;
+            --bg: #eef2f5;
             --text: #333;
         }
 
@@ -22,16 +22,17 @@
             background-color: #fff; padding: 15px 20px;
             box-shadow: 0 2px 10px rgba(0,0,0,0.1);
             display: flex; justify-content: space-between; align-items: center;
+            position: relative; z-index: 100;
         }
         .logo { font-weight: 800; font-size: 1.2rem; color: var(--primary); }
 
-        .container { max-width: 800px; margin: 0 auto; padding: 20px; }
+        .container { max-width: 900px; margin: 0 auto; padding: 20px; }
         
         .screen { display: none; animation: fadeIn 0.3s; }
         .screen.active { display: block; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-        /* Экран входа */
+        /* ВХОД */
         .login-box {
             background: #fff; padding: 40px 30px; border-radius: 15px;
             box-shadow: 0 5px 20px rgba(0,0,0,0.05); text-align: center;
@@ -46,48 +47,95 @@
         .btn-main {
             background: var(--primary-light); color: #fff; border: none; padding: 15px 30px;
             border-radius: 8px; font-size: 1.1rem; font-weight: bold; cursor: pointer; width: 100%;
+            transition: 0.2s;
         }
         .btn-main:hover { background: var(--primary); }
-        .btn-main:disabled { background: #ccc; cursor: not-allowed; }
 
-        /* Экран симуляции */
-        .dialogue-box {
-            background: #fff; border-radius: 15px; padding: 25px;
+        /* 3D ПРОСТРАНСТВО (РЕСЕПШЕН) */
+        .clinic-environment {
+            position: relative;
+            width: 100%; height: 250px;
+            background: linear-gradient(to bottom, #dbe4ea, #f4f7f6);
+            border-radius: 15px; overflow: hidden;
+            margin-bottom: 20px;
+            box-shadow: inset 0 10px 30px rgba(0,0,0,0.05);
+            perspective: 800px; /* Для 3D эффекта стойки */
+        }
+
+        .reception-desk {
+            position: absolute; bottom: -20px; left: 50%;
+            transform: translateX(-50%) rotateX(20deg);
+            width: 80%; height: 100px;
+            background: linear-gradient(180deg, #ffffff 0%, #e2e8f0 100%);
+            border-radius: 10px 10px 0 0;
+            box-shadow: 0 -10px 20px rgba(0,0,0,0.1);
+            border-top: 5px solid var(--primary-light);
+            z-index: 10;
+        }
+
+        .patient-character {
+            position: absolute; bottom: 50px; left: -100px; /* Прячется за экраном */
+            font-size: 5rem; z-index: 5;
+            transition: left 0.8s ease-out, transform 0.3s;
+            filter: drop-shadow(0 10px 10px rgba(0,0,0,0.2));
+        }
+        .patient-character.walk-in { left: 50%; transform: translateX(-50%); }
+
+        /* СПЕЦЭФФЕКТЫ */
+        @keyframes earthquake {
+            0% { transform: translate(1px, 1px) rotate(0deg); }
+            10% { transform: translate(-1px, -2px) rotate(-1deg); }
+            20% { transform: translate(-3px, 0px) rotate(1deg); }
+            30% { transform: translate(3px, 2px) rotate(0deg); }
+            40% { transform: translate(1px, -1px) rotate(1deg); }
+            50% { transform: translate(-1px, 2px) rotate(-1deg); }
+            60% { transform: translate(-3px, 1px) rotate(0deg); }
+            70% { transform: translate(3px, 1px) rotate(-1deg); }
+            80% { transform: translate(-1px, -1px) rotate(1deg); }
+            90% { transform: translate(1px, 2px) rotate(0deg); }
+            100% { transform: translate(1px, -2px) rotate(-1deg); }
+        }
+        .shake-effect { animation: earthquake 0.5s infinite; }
+        
+        @keyframes fire-alarm {
+            0%, 100% { background: linear-gradient(to bottom, #dbe4ea, #f4f7f6); }
+            50% { background: linear-gradient(to bottom, #ffcccc, #ff9999); }
+        }
+        .fire-effect { animation: fire-alarm 1s infinite; }
+
+        /* ДИАЛОГ И ВЫБОРЫ */
+        .dialogue-text {
+            background: #fff; border-radius: 15px; padding: 20px;
             box-shadow: 0 5px 20px rgba(0,0,0,0.1); margin-bottom: 20px;
-            display: flex; gap: 15px; align-items: flex-start;
+            position: relative;
         }
-        .avatar {
-            width: 60px; height: 60px; border-radius: 50%; background: #e9ecef;
-            display: flex; justify-content: center; align-items: center; font-size: 1.8rem; flex-shrink: 0;
+        .dialogue-text::after {
+            content: ''; position: absolute; top: -15px; left: 50%; transform: translateX(-50%);
+            border-width: 0 15px 15px 15px; border-style: solid; border-color: transparent transparent #fff transparent;
         }
-        .dialogue-text h4 { color: var(--primary); margin-bottom: 8px; }
-        .dialogue-text p { font-size: 1.1rem; line-height: 1.5; }
 
-        .choices-container { display: flex; flex-direction: column; gap: 10px; }
+        .dialogue-text h4 { color: var(--primary); margin-bottom: 5px; }
+
+        .choices-container { display: flex; flex-direction: column; gap: 12px; }
         .choice-btn {
             background: #fff; border: 2px solid #e9ecef; border-radius: 10px;
             padding: 15px; text-align: left; font-size: 1rem; cursor: pointer; transition: all 0.2s;
         }
-        .choice-btn:hover { border-color: var(--primary-light); background: #f8f9fa; }
+        .choice-btn:hover { border-color: var(--primary-light); background: #f8f9fa; transform: translateX(5px); }
 
-        /* Окно обратной связи */
+        /* ФИДБЕК И ПРОГРЕСС */
         #feedback-modal {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(0,0,0,0.6); display: none; justify-content: center; align-items: center; z-index: 1000;
         }
-        .feedback-content {
-            background: #fff; padding: 30px; border-radius: 15px; max-width: 500px; width: 90%; text-align: center;
-        }
+        .feedback-content { background: #fff; padding: 30px; border-radius: 15px; max-width: 500px; width: 90%; text-align: center; }
         .feedback-icon { font-size: 3rem; margin-bottom: 15px; }
         .feedback-title { font-size: 1.5rem; margin-bottom: 10px; font-weight: 800; }
         .feedback-desc { color: #555; margin-bottom: 20px; line-height: 1.5; }
 
-        .progress-bar {
-            height: 10px; background: #e9ecef; border-radius: 5px; margin-bottom: 20px; overflow: hidden;
-        }
+        .progress-bar { height: 10px; background: #e9ecef; border-radius: 5px; margin-bottom: 20px; overflow: hidden; }
         .progress-fill { height: 100%; background: var(--primary-light); width: 0%; transition: width 0.3s; }
-
-        #final-screen { text-align: center; }
+        
         .score-circle {
             width: 150px; height: 150px; border-radius: 50%; background: var(--primary-light);
             color: #fff; display: flex; justify-content: center; align-items: center;
@@ -98,7 +146,7 @@
 <body>
 
     <header>
-        <div class="logo">3D Dental Training</div>
+        <div class="logo">3D Dental Simulator</div>
         <div id="user-display" style="font-weight: 600; color: #666;"></div>
     </header>
 
@@ -106,38 +154,41 @@
         <!-- ЭКРАН 1: ВХОД -->
         <div id="login-screen" class="screen active">
             <div class="login-box">
-                <h2>Аттестация сервиса</h2>
-                <p style="color: #666; margin-top: 10px;">Введите ваши данные для прохождения тренажера. Результаты будут записаны в базу.</p>
+                <h2>Добро пожаловать на смену!</h2>
+                <p style="color: #666; margin-top: 10px;">Пройдите симуляцию рабочих ситуаций, чтобы подтвердить свою квалификацию.</p>
                 <input type="text" id="fio-input" placeholder="Введите ваше ФИО" required>
-                <button class="btn-main" onclick="startTraining()">Начать тестирование</button>
-                <p id="login-error" style="color: var(--danger); display: none; margin-top: 10px;">Пожалуйста, введите ФИО</p>
+                <button class="btn-main" onclick="startTraining()">Начать работу</button>
+                <p id="login-error" style="color: var(--danger); display: none; margin-top: 10px;">Введите ФИО для старта</p>
             </div>
         </div>
 
-        <!-- ЭКРАН 2: ИГРА -->
+        <!-- ЭКРАН 2: СИМУЛЯЦИЯ -->
         <div id="simulation-screen" class="screen">
             <div class="progress-bar"><div class="progress-fill" id="progress-fill"></div></div>
-            <p style="text-align: right; color: #666; margin-bottom: 10px; font-weight: bold;" id="question-counter">Ситуация 1 / 7</p>
+            <p style="text-align: right; color: #666; margin-bottom: 10px; font-weight: bold;" id="question-counter">Ситуация 1 / 10</p>
             
-            <div class="dialogue-box">
-                <div class="avatar" id="patient-avatar">👤</div>
-                <div class="dialogue-text">
-                    <h4 id="patient-name">Пациент</h4>
-                    <p id="patient-dialogue">Текст пациента...</p>
-                </div>
+            <!-- 3D Окружение -->
+            <div class="clinic-environment" id="clinic-env">
+                <div class="patient-character" id="patient-avatar">👤</div>
+                <div class="reception-desk"></div>
             </div>
 
-            <h3 style="margin-bottom: 15px;">Как вы ответите?</h3>
+            <div class="dialogue-text">
+                <h4 id="patient-name">Пациент</h4>
+                <p id="patient-dialogue">Текст пациента...</p>
+            </div>
+
+            <h3 style="margin-bottom: 15px; color: var(--primary);">Ваши действия:</h3>
             <div class="choices-container" id="choices-container"></div>
         </div>
 
-        <!-- ЭКРАН 3: РЕЗУЛЬТАТЫ -->
+        <!-- ЭКРАН 3: ФИНАЛ -->
         <div id="final-screen" class="screen">
             <div class="login-box">
-                <h2>Тестирование завершено!</h2>
-                <p style="color: #666; margin: 10px 0 20px;">Ваш итоговый балл:</p>
-                <div class="score-circle" id="final-score-display">0/7</div>
-                <p id="upload-status" style="font-weight: bold; color: var(--primary-light);">Отправка результатов в базу...</p>
+                <h2>Смена окончена!</h2>
+                <p style="color: #666; margin: 10px 0 20px;">Ваш рейтинг сервиса и безопасности:</p>
+                <div class="score-circle" id="final-score-display">0/10</div>
+                <p id="upload-status" style="font-weight: bold; color: var(--primary-light);">Сохранение результатов...</p>
             </div>
         </div>
     </div>
@@ -148,138 +199,232 @@
             <div class="feedback-icon" id="fb-icon">👍</div>
             <div class="feedback-title" id="fb-title">Отлично!</div>
             <div class="feedback-desc" id="fb-desc">Объяснение...</div>
-            <button class="btn-main" onclick="nextScenario()">Понятно, дальше</button>
+            <button class="btn-main" onclick="nextScenario()">Продолжить</button>
         </div>
     </div>
 
     <script>
-        // ВАЖНО: Вставьте сюда ссылку на ваше веб-приложение Google Apps Script!
+        // === ВСТАВЬТЕ ССЫЛКУ ИЗ GOOGLE APPS SCRIPT СЮДА ===
         const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwpzgXfOuCY9mWe1eLcKd5UKcl79U7lfnvj2Omj9TuQcP5gWthAU6gXXTYwgMsGyhp4tQ/exec';
 
         const scenarios = [
             {
-                avatar: '👩', name: 'Анна (Первичный пациент)',
-                dialogue: 'Здравствуйте, мне стоматолог сказал прийти сделать КТ обеих челюстей.',
+                type: 'normal', avatar: '👩', name: 'Светлана (Первичный пациент)',
+                dialogue: 'Здравствуйте, сколько стоит КТ зубов и как к вам попасть?',
                 choices: [
                     {
-                        text: 'Здравствуйте! Добро пожаловать в 3D Dental. Давайте оформим карточку. Присаживайтесь в зоне ожидания — мы вызовем вас в порядке живой очереди.',
-                        isCorrect: true,
-                        feedbackTitle: '+1 балл. Отличный старт',
-                        feedbackDesc: 'Вы поздоровались, проявили вежливость, объяснили процесс оформления и четко обозначили правило живой очереди.'
+                        text: 'Цена 15600. Давайте направление, садитесь, ждите.',
+                        isCorrect: false,
+                        feedbackTitle: 'Грубо!', feedbackDesc: 'Это звучит как приказ. Вы потеряете лояльность пациента с первой секунды.'
                     },
                     {
-                        text: 'Давайте ваше направление. Садитесь в коридоре, ждите, мы вас вызовем.',
+                        text: 'КТ стоит 15 600 тенге, у нас живая очередь, присаживайтесь.',
                         isCorrect: false,
-                        feedbackTitle: 'Ошибка! Слишком грубо',
-                        feedbackDesc: 'Отсутствие приветствия и приказной тон («давайте», «садитесь») создают негативное впечатление. Это прямой путь к отзыву "персонал грубый".'
+                        feedbackTitle: 'Сухо', feedbackDesc: 'Отсутствует приветствие и эмпатия. Это формальный ответ, который часто расценивается как хамство.'
+                    },
+                    {
+                        text: 'Здравствуйте! КТ обеих челюстей стоит 15 600 тенге. Прием у нас идет по живой очереди. Давайте оформим карточку, присаживайтесь, мы пригласим вас!',
+                        isCorrect: true,
+                        feedbackTitle: '+1 балл. Отличный сервис', feedbackDesc: 'Вежливо поздоровались, назвали точную цену, объяснили правила очереди и пригласили присесть.'
+                    },
+                    {
+                        text: 'Ой, ну вообще 15600, но сейчас очередь большая, может позже придете?',
+                        isCorrect: false,
+                        feedbackTitle: 'Отпугивание клиента', feedbackDesc: 'Вы сами заставляете пациента уйти к конкурентам.'
                     }
                 ]
             },
             {
-                avatar: '🏃‍♂️', name: 'Ерлан (Торопливый)',
-                dialogue: 'Девушка, я очень спешу! У меня прием у врача через 20 минут, сделайте мне снимок быстро без очереди, пожалуйста!',
+                type: 'rushed', avatar: '🏃‍♂️', name: 'Ерлан (Спешит)',
+                dialogue: 'Я очень опаздываю к врачу! Умоляю, сделайте КТ без очереди, мне срочно!',
                 choices: [
                     {
-                        text: 'Мужчина, у нас тут вообще-то живая очередь. Вон люди сидят, ждите как все.',
+                        text: 'Мужчина, тут все торопятся. У нас живая очередь, ждите.',
                         isCorrect: false,
-                        feedbackTitle: 'Ошибка! Провокация конфликта',
-                        feedbackDesc: 'Слово "вообще-то" звучит пассивно-агрессивно. Такой ответ заставит пациента нервничать еще больше.'
+                        feedbackTitle: 'Провокация конфликта', feedbackDesc: 'Такой ответ гарантированно вызовет скандал.'
                     },
                     {
-                        text: 'Здравствуйте! Понимаю, что вы торопитесь. У нас прием строго по живой очереди, сейчас перед вами 2 человека. Сама процедура займет 5 минут. Присаживайтесь, мы постараемся принять вас максимально быстро.',
+                        text: 'Извините, но я ничего не могу сделать. Правила для всех одни.',
+                        isCorrect: false,
+                        feedbackTitle: 'Безразличие', feedbackDesc: 'Ответ правильный по сути, но лишен сочувствия.'
+                    },
+                    {
+                        text: 'Здравствуйте! Понимаю, что вы торопитесь. Прием строго по живой очереди, перед вами всего 1 человек, а сам снимок займет 5 минут. Пожалуйста, присаживайтесь.',
                         isCorrect: true,
-                        feedbackTitle: '+1 балл. Профессионально',
-                        feedbackDesc: 'Вы проявили эмпатию, четко объяснили правила без негатива и успокоили конкретикой (сколько людей, сколько длится процедура).'
+                        feedbackTitle: '+1 балл. Профессионально', feedbackDesc: 'Вы проявили эмпатию, сняли неопределенность (сказав время) и соблюли регламент клиники.'
                     }
                 ]
             },
             {
-                avatar: '📝', name: 'Мария (Заполнение анкеты)',
-                dialogue: 'Зачем мне заполнять эту кипу бумаг? И согласие какое-то... Я просто зуб пришла сфоткать! У меня нет на это времени.',
+                type: 'paperwork', avatar: '📝', name: 'Мария (Анкета и согласие)',
+                dialogue: 'Зачем мне заполнять этот договор и анкету здоровья? Я просто снимок хочу сделать, не буду ничего писать!',
                 choices: [
                     {
-                        text: 'У нас такие правила, без анкеты и подписи мы вас не примем. Читайте и заполняйте, это обязательно.',
+                        text: 'Без бумаг мы вас не примем. Читайте и заполняйте.',
                         isCorrect: false,
-                        feedbackTitle: 'Ошибка! Отсутствие эмпатии',
-                        feedbackDesc: 'Отсылка к «нашим правилам» звучит как бюрократия. Пациент не понимает ценности этих бумаг и злится.'
+                        feedbackTitle: 'Бюрократ', feedbackDesc: 'Пациент не понимает ценности бумаг, для него это просто преграда.'
                     },
                     {
-                        text: 'Понимаю вас, бумаг немало. Но анкета нужна, чтобы врач учел все нюансы вашего здоровья (например, аллергии), а согласие — стандартное требование Минздрава для вашей безопасности. Давайте я помогу, здесь нужно только галочки поставить и подпись.',
+                        text: 'Понимаю вас, бумаг немало. Но анкета нужна, чтобы врач учел аллергии, а согласие — требование Минздрава для вашей безопасности. Давайте я помогу, тут нужны только подписи.',
                         isCorrect: true,
-                        feedbackTitle: '+1 балл. Снятие возражений',
-                        feedbackDesc: 'Вы объяснили ВЫГОДУ для пациента (безопасность, учет здоровья), сослались на закон (Минздрав) и предложили помощь. Это высший пилотаж.'
+                        feedbackTitle: '+1 балл. Убеждение', feedbackDesc: 'Вы объяснили выгоду (безопасность), сослались на закон и предложили помощь.'
+                    },
+                    {
+                        text: 'Ну ладно, не пишите, просто распишитесь внизу.',
+                        isCorrect: false,
+                        feedbackTitle: 'Нарушение протокола', feedbackDesc: 'Запрещено принимать пациента без заполненной анкеты здоровья. Это риск для клиники.'
                     }
                 ]
             },
             {
-                avatar: '😠', name: 'Айнур (Конфликтная)',
-                dialogue: 'Почему я жду уже 15 минут?! Я что, весь день тут должна сидеть? Зачем вы работаете, если не справляетесь?!',
+                type: 'conflict', avatar: '😠', name: 'Айнур (Злится из-за очереди)',
+                dialogue: 'Почему я жду уже 20 минут?! Вы издеваетесь? Я буду жаловаться!',
                 choices: [
                     {
-                        text: 'Приношу извинения за ожидание. Понимаю ваше недовольство. Сейчас в кабинете проводится сложный снимок, поэтому произошла задержка. Вы — следующая. Желаете воды или чай?',
-                        isCorrect: true,
-                        feedbackTitle: '+1 балл. Гашение конфликта',
-                        feedbackDesc: 'Вы извинились от лица клиники, объяснили причину задержки и предложили заботу (чай/вода). Это обезоруживает гнев.'
+                        text: 'Женщина, не кричите. Врач долго делает снимок, я его не потороплю.',
+                        isCorrect: false,
+                        feedbackTitle: 'Защита и обвинение', feedbackDesc: 'Вы перевели стрелки на врача и ответили агрессией.'
                     },
                     {
-                        text: 'Не кричите на меня, я тут при чем? Врач долго делает снимок, я не могу его поторопить.',
+                        text: 'Приношу извинения за ожидание. Понимаю ваше возмущение. В кабинете сложный случай, поэтому задержка. Вы следующая. Может, чай или воду?',
+                        isCorrect: true,
+                        feedbackTitle: '+1 балл. Гашение конфликта', feedbackDesc: 'Извинение + объяснение причины + предложение заботы = идеальное решение.'
+                    },
+                    {
+                        text: 'Молча отвернуться и игнорировать.',
                         isCorrect: false,
-                        feedbackTitle: 'Ошибка! Переход в защиту',
-                        feedbackDesc: 'Вы вступили в перепалку и переложили вину на коллегу. Это непрофессионально и гарантирует 1 звезду в 2ГИС.'
+                        feedbackTitle: 'Пассивная агрессия', feedbackDesc: 'Игнорирование приведет к жалобе руководству и 1 звезде в 2ГИС.'
                     }
                 ]
             },
             {
-                avatar: '😰', name: 'Игорь (Тревожный)',
-                dialogue: 'А это ваше КТ... это сильно вредное облучение? У меня зуб болит, но я боюсь этого огромного аппарата...',
+                type: 'fear', avatar: '😰', name: 'Игорь (Боится облучения)',
+                dialogue: 'А КТ — это сильно вредно? У меня зуб болит, но я боюсь радиации от этого огромного аппарата...',
                 choices: [
                     {
-                        text: 'Да никто еще от этого не умирал. Обычный рентген. Снимайте цепочки и становитесь.',
+                        text: 'Да никто еще не умирал. Обычный рентген.',
                         isCorrect: false,
-                        feedbackTitle: 'Ошибка! Обесценивание страха',
-                        feedbackDesc: 'Звучит пренебрежительно. Пациенту страшно, и ваш ответ не добавил ему уверенности в безопасности процедуры.'
+                        feedbackTitle: 'Обесценивание', feedbackDesc: 'Вы посмеялись над страхом пациента.'
                     },
                     {
-                        text: 'Не волнуйтесь! В наших современных аппаратах доза облучения минимальна, это абсолютно безопасно. Процедура быстрая и безболезненная, я буду рядом и всё вам подскажу.',
+                        text: 'Не волнуйтесь! В наших современных аппаратах доза облучения минимальна, это безопасно. Процедура быстрая, мы будем рядом.',
                         isCorrect: true,
-                        feedbackTitle: '+1 балл. Поддержка',
-                        feedbackDesc: 'Вы развеяли страх облучения, сделали акцент на современном оборудовании и пообещали контроль ситуации.'
+                        feedbackTitle: '+1 балл. Психологическая поддержка', feedbackDesc: 'Успокоили, привели аргумент (современный аппарат) и пообещали контроль.'
+                    },
+                    {
+                        text: 'Ну, облучение есть, конечно. Но без него врач вас не вылечит. Решайте сами.',
+                        isCorrect: false,
+                        feedbackTitle: 'Запугивание', feedbackDesc: 'Пациент может отказаться от услуги и уйти.'
                     }
                 ]
             },
             {
-                avatar: '🥴', name: 'Неизвестный (Неадекватное состояние)',
-                dialogue: '(Шатается, запах алкоголя) Слыш, мне тут зуб сфоткать надо... давай быстро, че стоим...',
+                type: 'intoxicated', avatar: '🥴', name: 'Неизвестный (Пьяный)',
+                dialogue: '(Шатается, запах перегара) Слыш... сделай снимок по-братски, а...',
                 choices: [
                     {
-                        text: 'Здравствуйте. Извините, но по регламенту безопасности мы не проводим медицинские процедуры пациентам в состоянии опьянения. Пожалуйста, приходите в другой день.',
-                        isCorrect: true,
-                        feedbackTitle: '+1 балл. Твердость и регламент',
-                        feedbackDesc: 'Вы сослались на официальные правила клиники (снимая ответственность с себя лично) и вежливо отказали без оскорблений.'
+                        text: 'Фу, вы пьяны! Уходите, или я вызову охрану!',
+                        isCorrect: false,
+                        feedbackTitle: 'Риск драки', feedbackDesc: 'Грубость спровоцирует неадекватную реакцию.'
                     },
                     {
-                        text: 'Вы пьяны! Немедленно покиньте помещение, или я вызову охрану!',
+                        text: 'Садитесь тихонько, сейчас сделаем, только не шумите.',
                         isCorrect: false,
-                        feedbackTitle: 'Ошибка! Агрессия',
-                        feedbackDesc: 'Это может спровоцировать физический конфликт или истерику. Общаться с такими пациентами нужно спокойно, ссылаясь на правила.'
+                        feedbackTitle: 'Нарушение ТБ', feedbackDesc: 'Строго запрещено обслуживать пациентов в состоянии алкогольного опьянения.'
+                    },
+                    {
+                        text: 'Извините, но по регламенту безопасности клиники мы не проводим процедуры в состоянии опьянения. Пожалуйста, приходите в другой день.',
+                        isCorrect: true,
+                        feedbackTitle: '+1 балл. Твердый отказ', feedbackDesc: 'Ссылка на регламент клиники снимает с вас личную ответственность и звучит строго, но вежливо.'
                     }
                 ]
             },
             {
-                avatar: '📱', name: 'Чат (WhatsApp / 2ГИС)',
-                dialogue: 'Здравствуйте, сколько стоит кт зубов и можно ли записаться сегодня на 15:00?',
+                type: 'chat', avatar: '📱', name: 'Чат (WhatsApp)',
+                dialogue: 'Сколько стоит КТ зубов и можно ли записаться на 15:00?',
                 choices: [
                     {
-                        text: 'КТ стоит 15600. Записи нет, у нас живая очередь.',
+                        text: 'КТ стоит 15600. Записи нет, живая очередь.',
                         isCorrect: false,
-                        feedbackTitle: 'Ошибка! Сухой ответ-отписка',
-                        feedbackDesc: 'Нет приветствия, нет приглашения в клинику. Ответ звучит так, будто вы хотите поскорее отвязаться от клиента.'
+                        feedbackTitle: 'Грубая отписка', feedbackDesc: 'Нет приветствия. Пациент почувствует, что ему не рады.'
                     },
                     {
-                        text: 'Здравствуйте! Стоимость КТ обеих челюстей — 7000 тг. Прием в 3D Dental ведется в порядке живой очереди, поэтому записываться не нужно. Будем рады видеть вас сегодня до 20:00! Подсказать вам наш адрес?',
+                        text: 'Здравствуйте! КТ обеих челюстей — 15 600 тг. Прием в 3D Dental ведется в порядке живой очереди, запись не требуется. Ждем вас сегодня до 20:00! Подсказать адрес?',
                         isCorrect: true,
-                        feedbackTitle: '+1 балл. Идеальная переписка',
-                        feedbackDesc: 'Вы ответили на все вопросы, объяснили формат живой очереди, добавили режим работы и закончили открытым вопросом.'
+                        feedbackTitle: '+1 балл. Забота в тексте', feedbackDesc: 'Ответили на всё, объяснили правила и пригласили.'
+                    },
+                    {
+                        text: '15600 тг. Приходите к 15:00.',
+                        isCorrect: false,
+                        feedbackTitle: 'Дезинформация', feedbackDesc: 'Вы не объяснили про живую очередь. Если пациент придет в 15:00 и будет ждать, он устроит скандал.'
+                    }
+                ]
+            },
+            {
+                type: 'earthquake', avatar: '🚨', name: 'ЧРЕЗВЫЧАЙНАЯ СИТУАЦИЯ',
+                dialogue: '(Здание начало трясти. Землетрясение! Пациент находится внутри аппарата КТ)',
+                choices: [
+                    {
+                        text: 'Бросить всё и срочно выбежать на улицу спасать себя.',
+                        isCorrect: false,
+                        feedbackTitle: 'Оставление в опасности', feedbackDesc: 'Вы не имеете права бросать пациента в аппарате.'
+                    },
+                    {
+                        text: 'Сказать пациенту: "Не шевелитесь, снимок почти готов!"',
+                        isCorrect: false,
+                        feedbackTitle: 'Фатальная ошибка', feedbackDesc: 'Безопасность жизни важнее снимка. Здание может обрушиться.'
+                    },
+                    {
+                        text: 'Срочно остановить скан, вывести пациента из аппарата и встать вместе с ним в безопасное место (несущая стена/дверной проем) или покинуть здание, если на 1 этаже.',
+                        isCorrect: true,
+                        feedbackTitle: '+1 балл. Правила ЧС', feedbackDesc: 'Жизнь пациента — приоритет. Немедленная остановка оборудования и эвакуация.'
+                    },
+                    {
+                        text: 'Начать кричать и паниковать, чтобы все выбегали.',
+                        isCorrect: false,
+                        feedbackTitle: 'Паника', feedbackDesc: 'Паника среди персонала приводит к давке и травмам.'
+                    }
+                ]
+            },
+            {
+                type: 'fire', avatar: '🔥', name: 'ЧРЕЗВЫЧАЙНАЯ СИТУАЦИЯ',
+                dialogue: '(В коридоре запахло гарью, сработала пожарная сигнализация. Вы с пациентом в кабинете).',
+                choices: [
+                    {
+                        text: 'Закрыть дверь в кабинет, чтобы дым не заходил, и продолжить работу.',
+                        isCorrect: false,
+                        feedbackTitle: 'Смертельная ошибка', feedbackDesc: 'Игнорировать пожарную тревогу категорически запрещено!'
+                    },
+                    {
+                        text: 'Немедленно прекратить работу, вывести пациента к эвакуационному выходу, вызвать 101 и по возможности использовать огнетушитель, если возгорание мелкое.',
+                        isCorrect: true,
+                        feedbackTitle: '+1 балл. Безупречно', feedbackDesc: 'Эвакуация людей — первоочередная задача. Вызов пожарных обязателен.'
+                    },
+                    {
+                        text: 'Побежать искать источник дыма, оставив пациента в кабинете.',
+                        isCorrect: false,
+                        feedbackTitle: 'Нарушение протокола', feedbackDesc: 'Вы не пожарный. Ваша задача — эвакуировать людей, а не играть в героя.'
+                    }
+                ]
+            },
+            {
+                type: 'post', avatar: '🙂', name: 'Дмитрий (После снимка)',
+                dialogue: 'Всё готово? А как мне забрать результаты?',
+                choices: [
+                    {
+                        text: 'Вот ваш диск. До свидания.',
+                        isCorrect: false,
+                        feedbackTitle: 'Упущенная возможность', feedbackDesc: 'Вежливо, но вы забыли попросить отзыв!'
+                    },
+                    {
+                        text: 'Ваш диск и распечатка готовы! Спасибо, что выбрали 3D Dental. Если вам понравился наш сервис, будем очень благодарны за отзыв в 2ГИС. Желаем здоровья!',
+                        isCorrect: true,
+                        feedbackTitle: '+1 балл. Идеальное завершение', feedbackDesc: 'Вы выдали результат, поблагодарили и аккуратно попросили отзыв, что поможет перекрыть негатив в 2ГИС.'
+                    },
+                    {
+                        text: 'Результаты на диске. Обязательно напишите нам 5 звезд в 2ГИС, иначе нас ругают.',
+                        isCorrect: false,
+                        feedbackTitle: 'Давление', feedbackDesc: 'Выпрашивать отзывы через жалость — непрофессионально.'
                     }
                 ]
             }
@@ -306,17 +451,30 @@
 
         function loadScenario() {
             const sc = scenarios[currentStep];
+            const env = document.getElementById('clinic-env');
+            const avatar = document.getElementById('patient-avatar');
             
-            // Обновление прогресса
+            // Сброс спецэффектов
+            env.classList.remove('shake-effect', 'fire-effect');
+            avatar.classList.remove('walk-in');
+
+            // Установка спецэффектов
+            if (sc.type === 'earthquake') env.classList.add('shake-effect');
+            if (sc.type === 'fire') env.classList.add('fire-effect');
+
+            // Анимация входа пациента
+            setTimeout(() => {
+                avatar.innerText = sc.avatar;
+                avatar.classList.add('walk-in');
+            }, 100);
+
+            // Обновление UI
             document.getElementById('question-counter').innerText = `Ситуация ${currentStep + 1} / ${scenarios.length}`;
             document.getElementById('progress-fill').style.width = `${((currentStep) / scenarios.length) * 100}%`;
-
-            // Установка текста
-            document.getElementById('patient-avatar').innerText = sc.avatar;
             document.getElementById('patient-name').innerText = sc.name;
             document.getElementById('patient-dialogue').innerText = sc.dialogue;
 
-            // Кнопки (перемешиваем)
+            // Генерация кнопок (перемешанных)
             const choicesContainer = document.getElementById('choices-container');
             choicesContainer.innerHTML = '';
             
@@ -353,10 +511,12 @@
 
         function nextScenario() {
             document.getElementById('feedback-modal').style.display = 'none';
+            document.getElementById('patient-avatar').classList.remove('walk-in'); // Пациент уходит
+            
             currentStep++;
 
             if (currentStep < scenarios.length) {
-                loadScenario();
+                setTimeout(loadScenario, 400); // Задержка для смены пациента
             } else {
                 finishTraining();
             }
@@ -371,7 +531,7 @@
             
             if (score === scenarios.length) {
                 scoreDisplay.style.background = 'var(--success)';
-            } else if (score < 4) {
+            } else if (score < 7) {
                 scoreDisplay.style.background = 'var(--danger)';
             }
 
@@ -388,23 +548,17 @@
                 return;
             }
 
-            const payload = {
-                fio: fio,
-                score: finalScore,
-                total: total
-            };
-
             fetch(GOOGLE_SCRIPT_URL, {
                 method: 'POST',
                 mode: 'no-cors',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(payload)
+                body: JSON.stringify({ fio: fio, score: finalScore, total: total })
             })
             .then(() => {
                 statusText.innerText = "Результаты успешно отправлены руководству!";
                 statusText.style.color = "var(--success)";
             })
-            .catch(error => {
+            .catch(() => {
                 statusText.innerText = "Ошибка отправки результатов. Проверьте интернет.";
                 statusText.style.color = "var(--danger)";
             });
