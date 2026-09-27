@@ -3,178 +3,232 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>3D Dental | Интерактивный Симулятор</title>
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;800&display=swap" rel="stylesheet">
+    <title>3D Dental | Изометрический Симулятор</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;800;900&display=swap" rel="stylesheet">
     <style>
         :root {
             --primary: #0056b3;
             --primary-light: #007bff;
             --success: #28a745;
             --danger: #dc3545;
-            --bg: #eef2f5;
-            --text: #333;
+            --warning: #ffc107;
+            --bg: #1a1e29;
+            --card-bg: #252b3b;
+            --text: #ffffff;
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Montserrat', sans-serif; }
-        body { background-color: var(--bg); color: var(--text); overflow-x: hidden; }
+        body { background-color: var(--bg); color: var(--text); overflow-x: hidden; user-select: none; }
 
         header {
-            background-color: #fff; padding: 15px 20px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            background-color: #202634; padding: 12px 20px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
             display: flex; justify-content: space-between; align-items: center;
-            position: relative; z-index: 100;
+            border-bottom: 2px solid #2e364a;
         }
-        .logo-header { height: 40px; object-fit: contain; }
+        .logo-header { height: 35px; object-fit: contain; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.5)); }
 
-        .container { max-width: 900px; margin: 0 auto; padding: 20px; }
+        .container { max-width: 900px; margin: 0 auto; padding: 15px; }
         
-        .screen { display: none; animation: fadeIn 0.3s; }
+        .screen { display: none; animation: fadeIn 0.4s ease-out; }
         .screen.active { display: block; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
 
         /* ВХОД И ВЫБОР ЯЗЫКА */
         .login-box {
-            background: #fff; padding: 40px 30px; border-radius: 15px;
-            box-shadow: 0 5px 20px rgba(0,0,0,0.05); text-align: center;
-            max-width: 500px; margin: 40px auto;
+            background: var(--card-bg); padding: 40px 25px; border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5); text-align: center;
+            max-width: 480px; margin: 30px auto; border: 1px solid #343d52;
         }
         .login-box input {
-            width: 100%; padding: 15px; margin: 20px 0; border: 2px solid #e9ecef;
-            border-radius: 8px; font-size: 1.1rem; outline: none;
+            width: 100%; padding: 16px; margin: 20px 0; border: 2px solid #343d52;
+            border-radius: 12px; font-size: 1.1rem; outline: none; background: #1a1e29; color: #fff;
+            transition: 0.3s;
         }
-        .login-box input:focus { border-color: var(--primary-light); }
+        .login-box input:focus { border-color: var(--primary-light); box-shadow: 0 0 10px rgba(0,123,255,0.4); }
         
         .btn-main {
-            background: var(--primary-light); color: #fff; border: none; padding: 15px 30px;
-            border-radius: 8px; font-size: 1.1rem; font-weight: bold; cursor: pointer; width: 100%;
-            transition: 0.2s; margin-bottom: 10px;
+            background: linear-gradient(135deg, #007bff, #0056b3); color: #fff; border: none; padding: 16px 30px;
+            border-radius: 12px; font-size: 1.1rem; font-weight: 800; cursor: pointer; width: 100%;
+            transition: all 0.2s; margin-bottom: 10px; box-shadow: 0 5px 15px rgba(0,123,255,0.3);
         }
-        .btn-main:hover { background: var(--primary); }
+        .btn-main:active { transform: scale(0.97); }
 
         .lang-btn {
-            background: #fff; border: 2px solid var(--primary-light); color: var(--primary-light);
+            background: transparent; border: 2px solid var(--primary-light); color: var(--primary-light);
+            box-shadow: none;
         }
         .lang-btn:hover { background: var(--primary-light); color: #fff; }
 
-        /* 3D ПРОСТРАНСТВО (РЕСЕПШЕН) */
-        .clinic-environment {
-            position: relative;
-            width: 100%; height: 260px;
-            background: linear-gradient(to bottom, #dbe4ea, #f4f7f6);
-            border-radius: 15px; overflow: hidden;
-            margin-bottom: 20px;
-            box-shadow: inset 0 10px 30px rgba(0,0,0,0.05);
-            perspective: 800px;
-            display: flex; justify-content: center;
-            transition: background 1s ease;
+        /* 3D ИЗОМЕТРИЧЕСКАЯ КОМНАТА РЕСЕПШЕНА */
+        .viewport-3d {
+            position: relative; width: 100%; height: 280px;
+            background: #2a3142; border-radius: 20px; overflow: hidden;
+            margin-bottom: 15px; border: 2px solid #3b455d;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.4);
+            perspective: 900px;
         }
 
-        .signboard {
-            position: absolute; top: 15px;
-            height: 70px;
-            filter: drop-shadow(0 5px 5px rgba(0,0,0,0.1));
-            z-index: 2;
+        .room-wall {
+            position: absolute; width: 100%; height: 65%; top: 0;
+            background: linear-gradient(180deg, #1e2433 0%, #2b3346 100%);
+            border-bottom: 4px solid #141824;
+        }
+
+        .wall-decor {
+            position: absolute; top: 15px; left: 20px; display: flex; gap: 15px; align-items: center;
+        }
+        .clock {
+            width: 35px; height: 35px; border-radius: 50%; border: 3px solid #fff;
+            position: relative; background: #202634; box-shadow: 0 2px 5px rgba(0,0,0,0.5);
+        }
+        .clock::after {
+            content:''; position: absolute; top: 6px; left: 14px; width: 2px; height: 10px; background: #fff;
+            transform-origin: bottom; transform: rotate(45deg);
+        }
+
+        .signboard { height: 50px; object-fit: contain; filter: drop-shadow(0 3px 6px rgba(0,0,0,0.6)); }
+
+        .room-floor {
+            position: absolute; width: 100%; height: 35%; bottom: 0;
+            background: repeating-linear-gradient(90deg, #3d465c, #3d465c 40px, #353f53 40px, #353f53 80px);
         }
 
         .reception-desk {
-            position: absolute; bottom: -20px; left: 50%;
-            transform: translateX(-50%) rotateX(20deg);
-            width: 80%; height: 100px;
-            background: linear-gradient(180deg, #ffffff 0%, #e2e8f0 100%);
-            border-radius: 10px 10px 0 0;
-            box-shadow: 0 -10px 20px rgba(0,0,0,0.1);
-            border-top: 5px solid var(--primary-light);
-            z-index: 10;
+            position: absolute; bottom: 0; left: 50%; transform: translateX(-50%);
+            width: 75%; height: 95px; background: linear-gradient(180deg, #2e364a 0%, #1c222e 100%);
+            border-radius: 15px 15px 0 0; border-top: 6px solid var(--primary-light);
+            box-shadow: 0 -8px 25px rgba(0,0,0,0.5); z-index: 10;
+            display: flex; justify-content: center; align-items: center;
         }
+        .desk-pc { width: 50px; height: 35px; background: #0a0d14; border-radius: 5px; border: 2px solid #55627d; }
+
+        /* ОЧЕРЕДЬ СИЛУЭТОВ */
+        .queue-line {
+            position: absolute; bottom: 40px; right: 15px; display: flex; gap: -10px; z-index: 4; opacity: 0.5;
+        }
+        .queue-person { font-size: 2.2rem; filter: grayscale(1); }
+
+        /* ПАЦИЕНТ И НАСТРОЕНИЕ */
+        .patient-container {
+            position: absolute; bottom: 35px; left: -120px; z-index: 6;
+            display: flex; flex-direction: column; align-items: center;
+            transition: left 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        .patient-container.walk-in { left: 50%; transform: translateX(-50%); }
+
+        .patience-bar-wrap {
+            width: 80px; height: 8px; background: rgba(0,0,0,0.6); border-radius: 10px;
+            overflow: hidden; border: 1px solid #fff; margin-bottom: 5px;
+        }
+        .patience-fill { height: 100%; width: 100%; background: var(--success); transition: width 0.4s, background 0.4s; }
 
         .patient-character {
-            position: absolute; bottom: 50px; left: -100px;
-            font-size: 5rem; z-index: 5;
-            transition: left 0.8s ease-out, transform 0.3s;
-            filter: drop-shadow(0 10px 10px rgba(0,0,0,0.2));
-            /* ПРИНУДИТЕЛЬНЫЕ ШРИФТЫ ДЛЯ ЭМОДЗИ (Чинит невидимые модельки на разных ОС) */
-            font-family: "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji", "Segoe UI Symbol", "Android Emoji", sans-serif;
+            font-size: 4.8rem; filter: drop-shadow(0 10px 15px rgba(0,0,0,0.6));
+            font-family: "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji", sans-serif;
+            transition: transform 0.2s;
         }
-        .patient-character.walk-in { left: 50%; transform: translateX(-50%); }
+
+        .status-float {
+            position: absolute; top: -30px; font-weight: 900; font-size: 1.1rem;
+            opacity: 0; transform: translateY(0); transition: all 0.6s ease-out; pointer-events: none;
+        }
+        .status-float.show { opacity: 1; transform: translateY(-20px); }
 
         /* СПЕЦЭФФЕКТЫ */
         @keyframes earthquake {
-            0% { transform: translate(1px, 1px) rotate(0deg); }
-            10% { transform: translate(-1px, -2px) rotate(-1deg); }
-            50% { transform: translate(-1px, 2px) rotate(-1deg); }
-            100% { transform: translate(1px, -2px) rotate(-1deg); }
+            0%, 100% { transform: translate(0, 0); }
+            20% { transform: translate(-4px, 3px); }
+            40% { transform: translate(4px, -3px); }
+            60% { transform: translate(-3px, -2px); }
+            80% { transform: translate(3px, 2px); }
         }
-        .shake-effect { animation: earthquake 0.5s infinite; }
+        .shake-effect { animation: earthquake 0.15s infinite; }
         
         @keyframes fire-alarm {
-            0%, 100% { background: linear-gradient(to bottom, #dbe4ea, #f4f7f6); }
-            50% { background: linear-gradient(to bottom, #ffcccc, #ff9999); }
+            0%, 100% { background: #2a3142; }
+            50% { background: #5c1818; }
         }
-        .fire-effect { animation: fire-alarm 1s infinite; }
+        .fire-effect { animation: fire-alarm 0.8s infinite; }
 
         @keyframes medical-alarm {
-            0%, 100% { background: linear-gradient(to bottom, #dbe4ea, #f4f7f6); }
-            50% { background: linear-gradient(to bottom, #cce5ff, #99ccff); }
+            0%, 100% { background: #2a3142; }
+            50% { background: #143852; }
         }
         .medical-effect { animation: medical-alarm 1s infinite; }
 
-        .zen-effect { background: linear-gradient(to bottom, #e0c3fc, #8ec5fc); }
+        .zen-effect { background: linear-gradient(180deg, #2d2342 0%, #1d2b45 100%); }
 
-        /* ДИАЛОГ И ВЫБОРЫ */
-        .dialogue-text {
-            background: #fff; border-radius: 15px; padding: 20px;
-            box-shadow: 0 5px 20px rgba(0,0,0,0.1); margin-bottom: 20px;
-            position: relative;
+        /* ИНТЕРФЕЙС ТАЙМЕРА И ДИАЛОГА */
+        .timer-bar {
+            height: 6px; background: var(--danger); width: 100%; margin-bottom: 10px;
+            border-radius: 3px; transform-origin: left; display: none;
         }
-        .dialogue-text::after {
-            content: ''; position: absolute; top: -15px; left: 50%; transform: translateX(-50%);
-            border-width: 0 15px 15px 15px; border-style: solid; border-color: transparent transparent #fff transparent;
-        }
-        .dialogue-text h4 { color: var(--primary); margin-bottom: 5px; }
 
-        .choices-container { display: flex; flex-direction: column; gap: 12px; }
+        .dialogue-card {
+            background: var(--card-bg); border-radius: 16px; padding: 20px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.3); margin-bottom: 15px;
+            border: 1px solid #343d52; position: relative;
+        }
+        .dialogue-card h4 { color: var(--primary-light); margin-bottom: 6px; font-size: 0.95rem; text-transform: uppercase; letter-spacing: 1px; }
+        .dialogue-card p { font-size: 1.05rem; line-height: 1.5; font-weight: 500; }
+
+        /* WHATSAPP ИНТЕРФЕЙС (СИТУАЦИЯ 8) */
+        .whatsapp-box {
+            background: #0b141a; border-radius: 15px; padding: 15px; margin-bottom: 15px;
+            border: 1px solid #222d34; display: none;
+        }
+        .wa-header { display: flex; align-items: center; gap: 10px; border-bottom: 1px solid #222d34; padding-bottom: 8px; margin-bottom: 10px; }
+        .wa-bubble { background: #202c33; padding: 10px 14px; border-radius: 10px; max-width: 85%; font-size: 0.95rem; line-height: 1.4; color: #e9edef; }
+
+        .choices-container { display: flex; flex-direction: column; gap: 10px; }
         .choice-btn {
-            background: #fff; border: 2px solid #e9ecef; border-radius: 10px;
-            padding: 15px; text-align: left; font-size: 1rem; cursor: pointer; transition: all 0.2s;
+            background: var(--card-bg); border: 2px solid #343d52; border-radius: 12px;
+            padding: 14px 18px; text-align: left; font-size: 0.95rem; color: #fff; cursor: pointer;
+            transition: all 0.2s; font-weight: 500; display: flex; align-items: center; gap: 10px;
         }
-        .choice-btn:hover { border-color: var(--primary-light); background: #f8f9fa; transform: translateX(5px); }
+        .choice-btn:hover { border-color: var(--primary-light); background: #2e364a; transform: translateX(4px); }
 
-        /* ФИДБЕК И ПРОГРЕСС */
+        /* ФИДБЕК МОДАЛКА С ИНФОГРАФИКОЙ */
         #feedback-modal {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.6); display: none; justify-content: center; align-items: center; z-index: 1000;
+            background: rgba(0,0,0,0.8); display: none; justify-content: center; align-items: center; z-index: 1000;
+            backdrop-filter: blur(5px);
         }
-        .feedback-content { background: #fff; padding: 30px; border-radius: 15px; max-width: 500px; width: 90%; text-align: center; }
-        .feedback-icon { font-size: 3rem; margin-bottom: 15px; }
-        .feedback-title { font-size: 1.5rem; margin-bottom: 10px; font-weight: 800; }
-        .feedback-desc { color: #555; margin-bottom: 20px; line-height: 1.5; }
+        .feedback-content {
+            background: var(--card-bg); padding: 30px 25px; border-radius: 20px; max-width: 480px; width: 90%;
+            text-align: center; border: 1px solid #3e485e; box-shadow: 0 20px 40px rgba(0,0,0,0.6);
+        }
+        .badge-icon { font-size: 3.5rem; margin-bottom: 10px; display: inline-block; }
+        .feedback-title { font-size: 1.4rem; margin-bottom: 10px; font-weight: 800; }
+        .feedback-desc { color: #cbd5e1; margin-bottom: 20px; line-height: 1.5; font-size: 0.95rem; text-align: left; background: #1a1e29; padding: 15px; border-radius: 10px; }
 
-        .progress-bar { height: 10px; background: #e9ecef; border-radius: 5px; margin-bottom: 20px; overflow: hidden; }
+        .progress-bar { height: 8px; background: #343d52; border-radius: 4px; margin-bottom: 15px; overflow: hidden; }
         .progress-fill { height: 100%; background: var(--primary-light); width: 0%; transition: width 0.3s; }
-        
+
         .score-circle {
-            width: 150px; height: 150px; border-radius: 50%; background: var(--primary-light);
+            width: 140px; height: 140px; border-radius: 50%; background: var(--primary-light);
             color: #fff; display: flex; justify-content: center; align-items: center;
-            font-size: 3rem; font-weight: bold; margin: 0 auto 20px;
+            font-size: 2.8rem; font-weight: 900; margin: 0 auto 20px; border: 4px solid #fff;
+            box-shadow: 0 0 20px rgba(0,123,255,0.5);
         }
     </style>
 </head>
 <body>
 
     <header>
-        <img src="logo.png" alt="3D Dental" class="logo-header">
-        <div id="user-display" style="font-weight: 600; color: #666;"></div>
+        <img src="logo.png" alt="3D Dental" class="logo-header" onerror="this.style.display='none'">
+        <div id="user-display" style="font-weight: 700; color: #94a3b8; font-size: 0.9rem;"></div>
     </header>
 
     <div class="container">
         <!-- ЭКРАН 0: ВЫБОР ЯЗЫКА -->
         <div id="lang-screen" class="screen active">
             <div class="login-box">
-                <h2>Выберите язык / Тілді таңдаңыз</h2>
-                <div style="margin-top: 30px;">
-                    <button class="btn-main lang-btn" onclick="setLang('ru')">Русский</button>
-                    <button class="btn-main lang-btn" onclick="setLang('kz')">Қазақша</button>
-                </div>
+                <h2 style="margin-bottom: 20px;">3D Dental Simulator</h2>
+                <p style="color: #94a3b8; margin-bottom: 25px;">Выберите язык / Тілді таңдаңыз</p>
+                <button class="btn-main lang-btn" onclick="setLang('ru')">🇷🇺 Русский язык</button>
+                <button class="btn-main lang-btn" onclick="setLang('kz')">🇰🇿 Қазақ тілі</button>
             </div>
         </div>
 
@@ -182,30 +236,67 @@
         <div id="login-screen" class="screen">
             <div class="login-box">
                 <h2 id="ui-welcome">Добро пожаловать на смену!</h2>
-                <p id="ui-login-desc" style="color: #666; margin-top: 10px;">Пройдите симуляцию рабочих ситуаций.</p>
-                <input type="text" id="fio-input" placeholder="Введите ваше ФИО" required>
-                <button class="btn-main" id="ui-start-btn" onclick="startTraining()">Начать работу</button>
-                <p id="login-error" style="color: var(--danger); display: none; margin-top: 10px;">Введите ФИО</p>
+                <p id="ui-login-desc" style="color: #94a3b8; margin-top: 10px; font-size: 0.95rem;">Пройдите интерактивный тренажер из 15 рабочих ситуаций.</p>
+                <input type="text" id="fio-input" placeholder="Введите ваше ФИО" autocomplete="off" required>
+                <button class="btn-main" id="ui-start-btn" onclick="startTraining()">Заступить на смену 🚀</button>
+                <p id="login-error" style="color: var(--danger); display: none; margin-top: 10px; font-weight: 700;">Введите ФИО</p>
             </div>
         </div>
 
         <!-- ЭКРАН 2: СИМУЛЯЦИЯ -->
         <div id="simulation-screen" class="screen">
             <div class="progress-bar"><div class="progress-fill" id="progress-fill"></div></div>
-            <p style="text-align: right; color: #666; margin-bottom: 10px; font-weight: bold;" id="question-counter">Ситуация 1 / 15</p>
-            
-            <div class="clinic-environment" id="clinic-env">
-                <img src="logo.png" alt="Signboard" class="signboard" onerror="this.style.display='none'">
-                <div class="patient-character" id="patient-avatar">👤</div>
-                <div class="reception-desk"></div>
+            <p style="text-align: right; color: #94a3b8; margin-bottom: 8px; font-weight: 800; font-size: 0.85rem;" id="question-counter">Ситуация 1 / 15</p>
+
+            <!-- 3D ИЗОМЕТРИЧЕСКАЯ КОМНАТА -->
+            <div class="viewport-3d" id="clinic-env">
+                <div class="room-wall">
+                    <div class="wall-decor">
+                        <div class="clock"></div>
+                        <img src="logo.png" alt="Signboard" class="signboard" onerror="this.style.display='none'">
+                    </div>
+                </div>
+                <div class="room-floor"></div>
+
+                <!-- ОЧЕРЕДЬ -->
+                <div class="queue-line">
+                    <span class="queue-person">👨‍💼</span>
+                    <span class="queue-person">👩‍🦰</span>
+                </div>
+
+                <!-- ПАЦИЕНТ -->
+                <div class="patient-container" id="patient-box">
+                    <div class="status-float" id="status-float"></div>
+                    <div class="patience-bar-wrap"><div class="patience-fill" id="patience-fill"></div></div>
+                    <div class="patient-character" id="patient-avatar">👤</div>
+                </div>
+
+                <div class="reception-desk">
+                    <div class="desk-pc"></div>
+                </div>
             </div>
 
-            <div class="dialogue-text">
+            <div class="timer-bar" id="timer-bar"></div>
+
+            <!-- WHATSAPP ОКНО (ДЛЯ СИТУАЦИИ 8) -->
+            <div class="whatsapp-box" id="whatsapp-box">
+                <div class="wa-header">
+                    <span style="font-size: 1.2rem;">📱</span>
+                    <div>
+                        <div style="font-weight: 800; font-size: 0.9rem; color: #e9edef;">3D Dental WhatsApp</div>
+                        <div style="font-size: 0.75rem; color: #8696a0;">online</div>
+                    </div>
+                </div>
+                <div class="wa-bubble" id="wa-text">...</div>
+            </div>
+
+            <!-- СТАНДАРТНЫЙ ДИАЛОГ -->
+            <div class="dialogue-card" id="dialogue-card">
                 <h4 id="patient-name">Пациент</h4>
                 <p id="patient-dialogue">Текст пациента...</p>
             </div>
 
-            <h3 id="ui-action-title" style="margin-bottom: 15px; color: var(--primary);">Ваши действия:</h3>
+            <h3 id="ui-action-title" style="margin-bottom: 12px; color: var(--primary-light); font-size: 1rem;">Ваш ответ:</h3>
             <div class="choices-container" id="choices-container"></div>
         </div>
 
@@ -213,9 +304,9 @@
         <div id="final-screen" class="screen">
             <div class="login-box">
                 <h2 id="ui-finish-title">Смена окончена!</h2>
-                <p id="ui-finish-desc" style="color: #666; margin: 10px 0 20px;">Ваш рейтинг сервиса:</p>
+                <p id="ui-finish-desc" style="color: #94a3b8; margin: 10px 0 20px;">Ваш итоговый рейтинг сервиса:</p>
                 <div class="score-circle" id="final-score-display">0/15</div>
-                <p id="upload-status" style="font-weight: bold; color: var(--primary-light);">Сохранение...</p>
+                <p id="upload-status" style="font-weight: bold; color: var(--primary-light);">Сохранение в базу...</p>
             </div>
         </div>
     </div>
@@ -223,16 +314,52 @@
     <!-- МОДАЛЬНОЕ ОКНО ФИДБЕКА -->
     <div id="feedback-modal">
         <div class="feedback-content">
-            <div class="feedback-icon" id="fb-icon">👍</div>
+            <div class="badge-icon" id="fb-icon">✅</div>
             <div class="feedback-title" id="fb-title">Отлично!</div>
-            <div class="feedback-desc" id="fb-desc">Объяснение...</div>
-            <button class="btn-main" id="ui-next-btn" onclick="nextScenario()">Продолжить</button>
+            <div class="feedback-desc" id="fb-desc">Разбор ситуации...</div>
+            <button class="btn-main" id="ui-next-btn" onclick="nextScenario()">Продолжить смену →</button>
         </div>
     </div>
 
     <script>
-        // === ВСТАВЬТЕ ССЫЛКУ ИЗ GOOGLE APPS SCRIPT СЮДА ===
+        // === ССЫЛКА GOOGLE APPS SCRIPT ===
         const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwpzgXfOuCY9mWe1eLcKd5UKcl79U7lfnvj2Omj9TuQcP5gWthAU6gXXTYwgMsGyhp4tQ/exec';
+
+        // --- WEB AUDIO API ДВИЖОК (ЗВУКИ БЕЗ ВНЕШНИХ ФАЙЛОВ) ---
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        
+        function playSound(type) {
+            if (audioCtx.state === 'suspended') audioCtx.resume();
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+
+            if (type === 'step') {
+                osc.type = 'triangle'; osc.frequency.setValueAtTime(120, audioCtx.currentTime);
+                gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.1);
+                osc.start(); osc.stop(audioCtx.currentTime + 0.1);
+            } else if (type === 'success') {
+                osc.type = 'sine'; osc.frequency.setValueAtTime(523.25, audioCtx.currentTime); // C5
+                osc.frequency.setValueAtTime(659.25, audioCtx.currentTime + 0.1); // E5
+                gain.gain.setValueAtTime(0.15, audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.3);
+                osc.start(); osc.stop(audioCtx.currentTime + 0.3);
+            } else if (type === 'error') {
+                osc.type = 'sawtooth'; osc.frequency.setValueAtTime(180, audioCtx.currentTime);
+                osc.frequency.setValueAtTime(110, audioCtx.currentTime + 0.15);
+                gain.gain.setValueAtTime(0.2, audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.35);
+                osc.start(); osc.stop(audioCtx.currentTime + 0.35);
+            } else if (type === 'siren') {
+                osc.type = 'sine'; osc.frequency.setValueAtTime(600, audioCtx.currentTime);
+                osc.frequency.linearRampToValueAtTime(900, audioCtx.currentTime + 0.25);
+                gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.3);
+                osc.start(); osc.stop(audioCtx.currentTime + 0.3);
+            }
+        }
 
         let lang = 'ru';
 
@@ -241,543 +368,213 @@
                 welcome: "Добро пожаловать на смену!",
                 loginDesc: "Пройдите симуляцию 15 рабочих ситуаций.",
                 placeholder: "Введите ваше ФИО",
-                startBtn: "Начать работу",
-                error: "Введите ФИО",
-                actionTitle: "Ваши действия:",
+                startBtn: "Заступить на смену 🚀",
+                error: "Введите ФИО!",
+                actionTitle: "Ваш ответ:",
                 finishTitle: "Смена окончена!",
                 finishDesc: "Ваш рейтинг сервиса и безопасности:",
-                uploading: "Сохранение результатов...",
-                success: "Результаты отправлены руководству!",
-                errorUpload: "Ошибка отправки в базу.",
-                nextBtn: "Продолжить",
+                uploading: "Сохранение результатов в Google Sheets...",
+                success: "Результаты успешно отправлены!",
+                errorUpload: "Ошибка выгрузки.",
+                nextBtn: "Продолжить смену →",
                 sit: "Ситуация"
             },
             kz: {
                 welcome: "Ауысымға қош келдіңіз!",
                 loginDesc: "Жұмыс жағдайларының 15 симуляциясынан өтіңіз.",
                 placeholder: "Аты-жөніңізді енгізіңіз",
-                startBtn: "Жұмысты бастау",
-                error: "Аты-жөніңізді енгізіңіз",
-                actionTitle: "Сіздің әрекеттеріңіз:",
+                startBtn: "Ауысымды бастау 🚀",
+                error: "Аты-жөніңізді енгізіңіз!",
+                actionTitle: "Сіздің жауабыңыз:",
                 finishTitle: "Ауысым аяқталды!",
                 finishDesc: "Сіздің қызмет көрсету рейтингіңіз:",
-                uploading: "Нәтижелер сақталуда...",
-                success: "Нәтижелер басшылыққа жіберілді!",
-                errorUpload: "Базаға жіберу қатесі.",
-                nextBtn: "Жалғастыру",
+                uploading: "Нәтижелер Google Sheets базасына сақталуда...",
+                success: "Нәтижелер жіберілді!",
+                errorUpload: "Жіберу қатесі.",
+                nextBtn: "Жалғастыру →",
                 sit: "Жағдай"
             }
         };
 
         const scenarios = [
+            // 1
             {
                 type: 'normal', avatar: '👩',
                 name: { ru: 'Светлана (Первичный пациент)', kz: 'Светлана (Жаңа пациент)' },
-                dialogue: { 
-                    ru: 'Здравствуйте, сколько стоит КТ зубов и как к вам попасть?', 
-                    kz: 'Сәлеметсіз бе, тіс КТ қанша тұрады және сіздерге қалай жазылуға болады?' 
-                },
+                dialogue: { ru: 'Здравствуйте, сколько стоит КТ зубов и как к вам попасть?', kz: 'Сәлеметсіз бе, тіс КТ қанша тұрады және сіздерге қалай жазылуға болады?' },
                 choices: [
-                    {
-                        text: { ru: 'Цена 15600. Давайте направление, садитесь, ждите.', kz: 'Бағасы 15600. Жолдаманы беріңіз, отырыңыз, күтіңіз.' },
-                        isCorrect: false,
-                        feedbackTitle: { ru: 'Грубо!', kz: 'Дөрекі!' },
-                        feedbackDesc: { ru: 'Это звучит как приказ.', kz: 'Бұл бұйрық сияқты естіледі.' }
-                    },
-                    {
-                        text: { ru: 'Здравствуйте! КТ стоит 15 600 тенге. Прием у нас по живой очереди. Давайте оформим карточку, присаживайтесь!', kz: 'Сәлеметсіз бе! КТ 15 600 теңге тұрады. Бізде қабылдау тірі кезек бойынша. Карточка рәсімдейік, отыра тұрыңыз!' },
-                        isCorrect: true,
-                        feedbackTitle: { ru: '+1 балл. Отличный сервис', kz: '+1 ұпай. Керемет қызмет' },
-                        feedbackDesc: { ru: 'Вежливо поздоровались и объяснили правила.', kz: 'Сыпайы сәлемдесіп, ережелерді түсіндірдіңіз.' }
-                    },
-                    {
-                        text: { ru: 'Ой, ну вообще 15600, но сейчас очередь большая, может позже придете?', kz: 'Жалпы 15600, бірақ қазір кезек үлкен, мүмкін кейінірек келерсіз?' },
-                        isCorrect: false,
-                        feedbackTitle: { ru: 'Потеря клиента', kz: 'Пациентті жоғалту' },
-                        feedbackDesc: { ru: 'Вы отпугнули пациента.', kz: 'Сіз пациентті үркітіп жібердіңіз.' }
-                    },
-                    {
-                        text: { ru: 'КТ стоит 15 600 тенге, у нас живая очередь, присаживайтесь.', kz: 'КТ 15 600 теңге тұрады, бізде тірі кезек, отырыңыз.' },
-                        isCorrect: false,
-                        feedbackTitle: { ru: 'Сухо', kz: 'Құрғақ жауап' },
-                        feedbackDesc: { ru: 'Отсутствует приветствие и эмпатия.', kz: 'Сәлемдесу мен эмпатия жоқ.' }
-                    }
+                    { text: { ru: 'Цена 15600. Давайте направление, садитесь, ждите.', kz: 'Бағасы 15600. Жолдаманы беріңіз, отырыңыз, күтіңіз.' }, isCorrect: false, feedbackTitle: { ru: '❌ Грубо!', kz: '❌ Дөрекі!' }, feedbackDesc: { ru: 'Приказной тон отпугивает клиентов.', kz: 'Бұйрық райлы сөз пациенттерді үркітеді.' } },
+                    { text: { ru: 'Здравствуйте! КТ стоит 15 600 тенге. Прием у нас по живой очереди. Давайте оформим карточку, присаживайтесь!', kz: 'Сәлеметсіз бе! КТ 15 600 теңге тұрады. Бізде қабылдау тірі кезек бойынша. Карточка рәсімдейік, отыра тұрыңыз!' }, isCorrect: true, feedbackTitle: { ru: '🌟 Отличный сервис', kz: '🌟 Керемет қызмет' }, feedbackDesc: { ru: 'Приветствие + Четкая цена + Правила очереди = Доверие.', kz: 'Сәлемдесу + Нақты баға + Кезек ережесі = Сенім.' } },
+                    { text: { ru: 'Ой, ну вообще 15600, но сейчас очередь большая, лучше позже прийти.', kz: 'Жалпы 15600, бірақ қазір кезек үлкен, кейін келгеніңіз жөн.' }, isCorrect: false, feedbackTitle: { ru: '❌ Потеря клиента', kz: '❌ Пациентті жоғалту' }, feedbackDesc: { ru: 'Вы сами отправили клиента к конкурентам.', kz: 'Сіз клиентті бәсекелестерге жібердіңіз.' } },
+                    { text: { ru: 'КТ стоит 15 600 тенге, живая очередь.', kz: 'КТ 15 600 теңге, тірі кезек.' }, isCorrect: false, feedbackTitle: { ru: '❌ Сухой ответ', kz: '❌ Құрғақ жауап' }, feedbackDesc: { ru: 'Нет приветствия и заботы.', kz: 'Сәлемдесу мен қамқорлық жоқ.' } }
                 ]
             },
+            // 2
             {
                 type: 'rushed', avatar: '🏃‍♂️',
                 name: { ru: 'Ерлан (Спешит)', kz: 'Ерлан (Асығыс)' },
-                dialogue: { 
-                    ru: 'Я очень опаздываю к врачу! Умоляю, сделайте КТ без очереди, мне срочно!', 
-                    kz: 'Мен дәрігерге өте қатты кешігіп жатырмын! Өтінемін, маған КТ-ны кезексіз жасап беріңізші!' 
-                },
+                dialogue: { ru: 'Я очень опаздываю к врачу! Умоляю, сделайте КТ без очереди!', kz: 'Мен дәрігерге кешігіп жатырмын! Өтінемін, кезексіз түсіріп беріңізші!' },
                 choices: [
-                    {
-                        text: { ru: 'Мужчина, тут все торопятся. У нас живая очередь, ждите.', kz: 'Аға, мұнда бәрі асығыс. Бізде тірі кезек, күтіңіз.' },
-                        isCorrect: false,
-                        feedbackTitle: { ru: 'Конфликт', kz: 'Жанжал' },
-                        feedbackDesc: { ru: 'Гарантированный скандал.', kz: 'Бұл сөзсіз жанжал тудырады.' }
-                    },
-                    {
-                        text: { ru: 'Здравствуйте! Понимаю, что вы торопитесь. Прием строго по очереди, перед вами 1 человек, снимок займет 5 минут. Присаживайтесь.', kz: 'Сәлеметсіз бе! Асығып тұрғаныңызды түсінемін. Бірақ қабылдау кезекпен, алдыңызда 1 адам бар, суретке түсіру 5 минут алады. Отыра тұрыңыз.' },
-                        isCorrect: true,
-                        feedbackTitle: { ru: '+1 балл', kz: '+1 ұпай' },
-                        feedbackDesc: { ru: 'Эмпатия и соблюдение регламента.', kz: 'Эмпатия және ережені сақтау.' }
-                    },
-                    {
-                        text: { ru: 'Извините, но я ничего не могу сделать. Правила для всех одни.', kz: 'Кешіріңіз, бірақ мен ештеңе істей алмаймын. Ереже бәріне ортақ.' },
-                        isCorrect: false,
-                        feedbackTitle: { ru: 'Безразличие', kz: 'Немқұрайлылық' },
-                        feedbackDesc: { ru: 'Ответ правильный по сути, но лишен сочувствия.', kz: 'Жауап мағынасы бойынша дұрыс, бірақ жанашырлық жоқ.' }
-                    },
-                    {
-                        text: { ru: 'Ладно, давайте документы, проведу вас без очереди, чтобы не ругались.', kz: 'Жарайды, құжаттарыңызды беріңіз, ұрыспас үшін сізді кезексіз өткізейін.' },
-                        isCorrect: false,
-                        feedbackTitle: { ru: 'Нарушение правил', kz: 'Ережені бұзу' },
-                        feedbackDesc: { ru: 'Вы нарушили живую очередь. Другие пациенты будут в ярости.', kz: 'Сіз кезекті бұздыңыз. Басқа пациенттер қатты ашуланады.' }
-                    }
+                    { text: { ru: 'Мужчина, тут все торопятся. Ждите.', kz: 'Аға, мұнда бәрі асығыс. Күтіңіз.' }, isCorrect: false, feedbackTitle: { ru: '❌ Конфликт', kz: '❌ Жанжал' }, feedbackDesc: { ru: 'Вы провоцируете скандал в холле.', kz: 'Сіз жанжал тудырып жатырсыз.' } },
+                    { text: { ru: 'Здравствуйте! Понимаю ваш спешку. Прием строго по очереди, перед вами 1 человек, процедура займет 5 минут.', kz: 'Сәлеметсіз бе! Асығып тұрғаныңызды түсінемін. Қабылдау кезекпен, алдыңызда 1 адам бар, сурет 5 минут алады.' }, isCorrect: true, feedbackTitle: { ru: '🌟 Эмпатия', kz: '🌟 Эмпатия' }, feedbackDesc: { ru: 'Понимание проблемы + Конкретика по времени убирает негатив.', kz: 'Асығыстықты түсіну + Уақытты нақты айту.' } },
+                    { text: { ru: 'Извините, правила для всех одни.', kz: 'Кешіріңіз, ереже бәріне ортақ.' }, isCorrect: false, feedbackTitle: { ru: '❌ Безразличие', kz: '❌ Немқұрайлылық' }, feedbackDesc: { ru: 'Формально верно, но звучит черство.', kz: 'Формальды түрде дұрыс, бірақ суық.' } },
+                    { text: { ru: 'Ладно, идите без очереди.', kz: 'Жарайды, кезексіз өтіңіз.' }, isCorrect: false, feedbackTitle: { ru: '❌ Нарушение', kz: '❌ Ережені бұзу' }, feedbackDesc: { ru: 'Остальная очередь устроит бунт.', kz: 'Басқа кезектегілер ашуланады.' } }
                 ]
             },
+            // 3
             {
                 type: 'paperwork', avatar: '📝',
-                name: { ru: 'Мария (Договор)', kz: 'Мария (Келісімшарт)' },
-                dialogue: { 
-                    ru: 'Зачем мне заполнять анкету здоровья? Я просто снимок хочу сделать, не буду ничего писать!', 
-                    kz: 'Денсаулық сауалнамасын не үшін толтыруым керек? Мен тек суретке түсіргім келеді, ештеңе жазбаймын!' 
-                },
+                name: { ru: 'Мария (Анкета)', kz: 'Мария (Сауалнама)' },
+                dialogue: { ru: 'Зачем мне заполнять анкету? Я просто снимок хочу сделать!', kz: 'Сауалнаманы не үшін толтырамын? Мен тек суретке түсемін!' },
                 choices: [
-                    {
-                        text: { ru: 'Без бумаг мы вас не примем.', kz: 'Қағазсыз біз сізді қабылдамаймыз.' },
-                        isCorrect: false,
-                        feedbackTitle: { ru: 'Бюрократия', kz: 'Төрешілдік' },
-                        feedbackDesc: { ru: 'Пациент злится.', kz: 'Пациент ашуланады.' }
-                    },
-                    {
-                        text: { ru: 'Анкета нужна, чтобы врач учел аллергии, а согласие — требование Минздрава для вашей безопасности. Давайте я помогу.', kz: 'Сауалнама дәрігер сіздің аллергияңызды ескеруі үшін қажет, ал келісім — сіздің қауіпсіздігіңіз үшін Денсаулық сақтау министрлігінің талабы. Мен көмектесейін.' },
-                        isCorrect: true,
-                        feedbackTitle: { ru: '+1 балл. Убеждение', kz: '+1 ұпай. Сендіру' },
-                        feedbackDesc: { ru: 'Объяснили выгоду и помогли.', kz: 'Пайдасын түсіндіріп, көмектестіңіз.' }
-                    },
-                    {
-                        text: { ru: 'Ну ладно, не пишите, просто распишитесь внизу.', kz: 'Жарайды, жазбаңыз, тек төменде қол қойыңыз.' },
-                        isCorrect: false,
-                        feedbackTitle: { ru: 'Нарушение протокола', kz: 'Хаттаманы бұзу' },
-                        feedbackDesc: { ru: 'Это риск для клиники.', kz: 'Бұл клиника үшін тәуекел.' }
-                    },
-                    {
-                        text: { ru: 'Позвать врача, пусть он сам с вами разбирается.', kz: 'Дәрігерді шақыру, өзі шешсін.' },
-                        isCorrect: false,
-                        feedbackTitle: { ru: 'Перекладывание работы', kz: 'Жұмысты аудара салу' },
-                        feedbackDesc: { ru: 'Оформление бумаг — обязанность администратора.', kz: 'Құжаттарды рәсімдеу — әкімшінің міндеті.' }
-                    }
+                    { text: { ru: 'Без бумаг мы вас не примем.', kz: 'Қағазсыз қабылдамаймыз.' }, isCorrect: false, feedbackTitle: { ru: '❌ Бюрократия', kz: '❌ Төрешілдік' }, feedbackDesc: { ru: 'Отсылка к правилам бесит клиентов.', kz: 'Ережеге сілтеме жасау ашу тудырады.' } },
+                    { text: { ru: 'Анкета нужна для учета аллергий, а согласие — требование Минздрава для вашей безопасности. Давайте помогу!', kz: 'Сауалнама аллергияны ескеру үшін, ал келісім — қауіпсіздігіңіз үшін Министрлік талабы. Көмектесейін!' }, isCorrect: true, feedbackTitle: { ru: '🌟 Аргументация', kz: '🌟 Уәжді аргумент' }, feedbackDesc: { ru: 'Объяснили ВЫГОДУ для пациента.', kz: 'Пациент үшін ПАЙДАСЫН түсіндірдіңіз.' } },
+                    { text: { ru: 'Ну ладно, просто распишитесь внизу.', kz: 'Жарайды, тек төменге қол қойыңыз.' }, isCorrect: false, feedbackTitle: { ru: '❌ Нарушение', kz: '❌ Бұзушылық' }, feedbackDesc: { ru: 'Юридический риск для клиники.', kz: 'Заңды тәуекел.' } },
+                    { text: { ru: 'Позову врача, пусть сам объясняет.', kz: 'Дәрігерді шақырайын, өзі түсіндірсін.' }, isCorrect: false, feedbackTitle: { ru: '❌ Перекладывание', kz: '❌ Жауапкершіліктен қашу' }, feedbackDesc: { ru: 'Оформление — работа админа.', kz: 'Рәсімдеу — әкімшінің жұмысы.' } }
                 ]
             },
+            // 4
             {
                 type: 'conflict', avatar: '😠',
                 name: { ru: 'Айнур (Конфликт)', kz: 'Айнур (Жанжал)' },
-                dialogue: { 
-                    ru: 'Почему я жду уже 20 минут?! Вы издеваетесь? Я буду жаловаться!', 
-                    kz: 'Неге мен 20 минут бойы күтіп отырмын?! Мазақ етіп отырсыздар ма? Мен шағымданамын!' 
-                },
+                dialogue: { ru: 'Почему я жду 20 минут?! Зачем вы работаете, если не успеваете?!', kz: 'Неге 20 минут күтемін?! Үлгермесеңіздер неге жұмыс істейсіздер?!' },
                 choices: [
-                    {
-                        text: { ru: 'Женщина, не кричите. Врач долго делает снимок.', kz: 'Айқайламаңыз. Дәрігер суретті көпке дейін түсіреді.' },
-                        isCorrect: false,
-                        feedbackTitle: { ru: 'Обвинение', kz: 'Айыптау' },
-                        feedbackDesc: { ru: 'Вы ответили агрессией.', kz: 'Сіз агрессиямен жауап бердіңіз.' }
-                    },
-                    {
-                        text: { ru: 'Приношу извинения. Понимаю ваше возмущение. В кабинете сложный случай. Вы следующая. Может, воду?', kz: 'Кешірім сұраймын. Ашулануыңызды түсінемін. Кабинетте күрделі жағдай. Келесі сізсіз. Су ішесіз бе?' },
-                        isCorrect: true,
-                        feedbackTitle: { ru: '+1 балл', kz: '+1 ұпай' },
-                        feedbackDesc: { ru: 'Извинение и забота гасят конфликт.', kz: 'Кешірім сұрау мен қамқорлық жанжалды басады.' }
-                    },
-                    {
-                        text: { ru: 'Молча отвернуться и игнорировать.', kz: 'Үндемей теріс айналып, елемеу.' },
-                        isCorrect: false,
-                        feedbackTitle: { ru: 'Игнорирование', kz: 'Елемеу' },
-                        feedbackDesc: { ru: 'Игнорирование приведет к жалобе руководству.', kz: 'Елемеу басшылыққа шағым түсуіне әкеледі.' }
-                    },
-                    {
-                        text: { ru: 'Если не хотите ждать, можете идти в другую клинику.', kz: 'Күткіңіз келмесе, басқа клиникаға бара беріңіз.' },
-                        isCorrect: false,
-                        feedbackTitle: { ru: 'Хамство', kz: 'Дөрекілік' },
-                        feedbackDesc: { ru: 'Абсолютно недопустимый ответ.', kz: 'Мүлдем жол берілмейтін жауап.' }
-                    }
+                    { text: { ru: 'Не кричите. Врач долго делает снимок.', kz: 'Айқайламаңыз. Дәрігер ұзақ түсіріп жатыр.' }, isCorrect: false, feedbackTitle: { ru: '❌ Перекладывание вины', kz: '❌ Кінәні аудару' }, feedbackDesc: { ru: 'Свалили вину на коллегу.', kz: 'Кінәні әріптесіңізге арттыңыз.' } },
+                    { text: { ru: 'Приношу извинения за задержку. В кабинете сложный случай. Вы следующая, предложить вам воды?', kz: 'Кешірім сұраймын. Кабинетте күрделі жағдай. Келесі сізсіз, су ішесіз бе?' }, isCorrect: true, feedbackTitle: { ru: '🌟 Гашение гнева', kz: '🌟 Жанжалды басу' }, feedbackDesc: { ru: 'Извинение + Причина + Забота = Успокоение.', kz: 'Кешірім + Себебі + Қамқорлық.' } },
+                    { text: { ru: 'Молча отвернуться.', kz: 'Үндемей теріс айналу.' }, isCorrect: false, feedbackTitle: { ru: '❌ Хамство', kz: '❌ Дөрекілік' }, feedbackDesc: { ru: 'Гарантированная 1 звезда в 2ГИС.', kz: '2ГИС-те 1 жұлдыз кепілді.' } },
+                    { text: { ru: 'Идите в другую клинику, если не нравится.', kz: 'Ұнамаса басқа клиникаға барыңыз.' }, isCorrect: false, feedbackTitle: { ru: '❌ Увольнение', kz: '❌ Жұмыстан босату' }, feedbackDesc: { ru: 'Недопустимая грубость.', kz: 'Мүлдем жол берілмейді.' } }
                 ]
             },
+            // 5
             {
                 type: 'child', avatar: '👶',
                 name: { ru: 'Динара (Мама с ребенком)', kz: 'Динара (Баласы бар ана)' },
-                dialogue: { 
-                    ru: 'Мой сын боится аппарата и плачет. Могу я зайти с ним и подержать его за руку во время КТ?', 
-                    kz: 'Ұлым аппараттан қорқып, жылап жатыр. Мен онымен бірге кіріп, КТ кезінде қолынан ұстай аламын ба?' 
-                },
+                dialogue: { ru: 'Сын плачет и боится. Могу я зайти с ним и подержать за руку?', kz: 'Ұлым жылап қорқып тұр. Жанында қолынан ұстап тұра алам ба?' },
                 choices: [
-                    {
-                        text: { ru: 'Нет, по технике безопасности в кабинете может находиться только пациент.', kz: 'Жоқ, қауіпсіздік ережелері бойынша кабинетте тек пациент болуы керек.' },
-                        isCorrect: false,
-                        feedbackTitle: { ru: 'Слишком жестко', kz: 'Өте қатаң' },
-                        feedbackDesc: { ru: 'Родителям разрешено присутствовать в фартуке.', kz: 'Ата-аналарға қорғаныш алжапқышын киіп қатысуға рұқсат етіледі.' }
-                    },
-                    {
-                        text: { ru: 'Сказать, что с детьми вообще нельзя делать КТ.', kz: 'Балалармен КТ жасауға мүлдем болмайтынын айту.' },
-                        isCorrect: false,
-                        feedbackTitle: { ru: 'Дезинформация', kz: 'Жалған ақпарат' },
-                        feedbackDesc: { ru: 'Вы отказываете в услуге без повода.', kz: 'Сіз себепсіз қызмет көрсетуден бас тарттыңыз.' }
-                    },
-                    {
-                        text: { ru: 'Конечно! Вы наденете специальный свинцовый фартук для защиты от облучения и сможете быть рядом с сыном.', kz: 'Әрине! Сіз радиациядан қорғау үшін арнайы қорғасын алжапқышын киіп, ұлыңыздың жанында бола аласыз.' },
-                        isCorrect: true,
-                        feedbackTitle: { ru: '+1 балл. Эмпатия', kz: '+1 ұпай. Эмпатия' },
-                        feedbackDesc: { ru: 'Вы успокоили мать и соблюли протокол защиты.', kz: 'Сіз ананы тыныштандырып, қорғау хаттамасын сақтадыңыз.' }
-                    },
-                    {
-                        text: { ru: 'Заходите, но если он дернется, сами виноваты, переделывать не будем.', kz: 'Кіріңіз, бірақ егер ол қозғалып кетсе, өзіңіз кінәлісіз, қайта жасамаймыз.' },
-                        isCorrect: false,
-                        feedbackTitle: { ru: 'Пассивная агрессия', kz: 'Пассивті агрессия' },
-                        feedbackDesc: { ru: 'Снятие ответственности через обвинение.', kz: 'Айыптау арқылы жауапкершіліктен құтылу.' }
-                    }
+                    { text: { ru: 'Нет, посторонним нельзя.', kz: 'Жоқ, бөгде адамдарға болмайды.' }, isCorrect: false, feedbackTitle: { ru: '❌ Отказ', kz: '❌ Бас тарту' }, feedbackDesc: { ru: 'Родителям можно в защитном фартуке.', kz: 'Ата-анаға қорғаныш алжапқышымен болады.' } },
+                    { text: { ru: 'Конечно! Вы наденете защитный свинцовый фартук и будете рядом.', kz: 'Әрине! Қорғаныс алжапқышын киіп, жанында боласыз.' }, isCorrect: true, feedbackTitle: { ru: '🌟 Забота о детях', kz: '🌟 Балаға қамқорлық' }, feedbackDesc: { ru: 'Соблюдение ТБ + Лояльность родителя.', kz: 'Қауіпсіздік + Ананың ризашылығы.' } },
+                    { text: { ru: 'Детям вообще КТ делать нельзя.', kz: 'Балаларға КТ жасауға болмайды.' }, isCorrect: false, feedbackTitle: { ru: '❌ Ложь', kz: '❌ Өтірік' }, feedbackDesc: { ru: 'Дезинформация.', kz: 'Жалған ақпарат.' } },
+                    { text: { ru: 'Пусть сам заходит, он уже большой.', kz: 'Өзі кірсін, үлкен бала ғой.' }, isCorrect: false, feedbackTitle: { ru: '❌ Черствость', kz: '❌ Тасбауырлық' }, feedbackDesc: { ru: 'Ребенок сорвет снимок.', kz: 'Бала суретті бүлдіреді.' } }
                 ]
             },
+            // 6
             {
                 type: 'fear', avatar: '😰',
-                name: { ru: 'Игорь (Страх облучения)', kz: 'Игорь (Радиациядан қорқу)' },
-                dialogue: { 
-                    ru: 'А КТ — это сильно вредно? Я боюсь радиации...', 
-                    kz: 'Ал КТ өте зиян ба? Мен радиациядан қорқамын...' 
-                },
+                name: { ru: 'Игорь (Страх радиации)', kz: 'Игорь (Радиациядан қорқу)' },
+                dialogue: { ru: 'А КТ — это сильно вредно? Я очень боюсь облучения...', kz: 'КТ өте зиян ба? Радиациядан қорқамын...' },
                 choices: [
-                    {
-                        text: { ru: 'Да никто еще не умирал.', kz: 'Бұдан әлі ешкім өлген жоқ.' },
-                        isCorrect: false,
-                        feedbackTitle: { ru: 'Обесценивание', kz: 'Құнсыздандыру' },
-                        feedbackDesc: { ru: 'Вы посмеялись над страхом.', kz: 'Сіз қорқынышқа күлдіңіз.' }
-                    },
-                    {
-                        text: { ru: 'Не волнуйтесь! В наших современных аппаратах доза минимальна, это безопасно. Я буду рядом.', kz: 'Уайымдамаңыз! Біздің заманауи аппараттарда доза өте аз, бұл қауіпсіз. Мен жаныңызда боламын.' },
-                        isCorrect: true,
-                        feedbackTitle: { ru: '+1 балл. Поддержка', kz: '+1 ұпай. Қолдау' },
-                        feedbackDesc: { ru: 'Успокоили и поддержали.', kz: 'Тыныштандырып, қолдау көрсеттіңіз.' }
-                    },
-                    {
-                        text: { ru: 'Ну, облучение есть, конечно. Решайте сами.', kz: 'Радиация бар, әрине. Өзіңіз шешіңіз.' },
-                        isCorrect: false,
-                        feedbackTitle: { ru: 'Запугивание', kz: 'Қорқыту' },
-                        feedbackDesc: { ru: 'Пациент может отказаться от услуги.', kz: 'Пациент қызметтен бас тартуы мүмкін.' }
-                    },
-                    {
-                        text: { ru: 'Проигнорировать вопрос и молча включить аппарат.', kz: 'Сұрақты елемей, аппаратты үндемей қосу.' },
-                        isCorrect: false,
-                        feedbackTitle: { ru: 'Равнодушие', kz: 'Немқұрайлылық' },
-                        feedbackDesc: { ru: 'Пациенту станет еще страшнее.', kz: 'Пациент одан сайын қорқады.' }
-                    }
+                    { text: { ru: 'Никто еще не умирал.', kz: 'Ешкім өлген жоқ бұдан.' }, isCorrect: false, feedbackTitle: { ru: '❌ Насмешка', kz: '❌ Келемеждеу' }, feedbackDesc: { ru: 'Обесценивание страха.', kz: 'Қорқынышты елемеу.' } },
+                    { text: { ru: 'В наших современных аппаратах доза минимальна и безопасна. Я буду рядом!', kz: 'Заманауи аппаратта доза өте аз әрі қауіпсіз. Мен жаныңызда боламын!' }, isCorrect: true, feedbackTitle: { ru: '🌟 Безопасность', kz: '🌟 Қауіпсіздік' }, feedbackDesc: { ru: 'Экспертный аргумент успокаивает.', kz: 'Сараптамалық уәж тыныштандырады.' } },
+                    { text: { ru: 'Ну облучение есть, конечно. Решайте сами.', kz: 'Радиация бар әрине. Өзіңіз шешіңіз.' }, isCorrect: false, feedbackTitle: { ru: '❌ Запугивание', kz: '❌ Қорқыту' }, feedbackDesc: { ru: 'Пациент убежит.', kz: 'Пациент қашып кетеді.' } },
+                    { text: { ru: 'Молча включить аппарат.', kz: 'Үндемей аппаратты қосу.' }, isCorrect: false, feedbackTitle: { ru: '❌ Игнор', kz: '❌ Елемеу' }, feedbackDesc: { ru: 'Усиливает панику.', kz: 'Үрейді күшейтеді.' } }
                 ]
             },
+            // 7
             {
                 type: 'intoxicated', avatar: '🥴',
-                name: { ru: 'Пациент (Опьянение)', kz: 'Пациент (Мас күйде)' },
-                dialogue: { 
-                    ru: 'Слыш... сделай снимок по-братски, а...', 
-                    kz: 'Ей... бауырым, суретке түсіріп жіберші...' 
-                },
+                name: { ru: 'Пациент (Опьянение)', kz: 'Пациент (Мас)' },
+                dialogue: { ru: 'Слышь... сделай снимок быстро по-братски...', kz: 'Ей... суретке тез түсіріп жіберші...' },
                 choices: [
-                    {
-                        text: { ru: 'Фу, вы пьяны! Уходите!', kz: 'Сіз массыз! Кетіңіз мұннан!' },
-                        isCorrect: false,
-                        feedbackTitle: { ru: 'Агрессия', kz: 'Агрессия' },
-                        feedbackDesc: { ru: 'Риск драки.', kz: 'Төбелес қаупі бар.' }
-                    },
-                    {
-                        text: { ru: 'Извините, но по регламенту безопасности мы не проводим процедуры в состоянии опьянения. Приходите в другой день.', kz: 'Кешіріңіз, бірақ қауіпсіздік ережелері бойынша біз мас күйдегі адамдарға процедура жасамаймыз. Басқа күні келіңіз.' },
-                        isCorrect: true,
-                        feedbackTitle: { ru: '+1 балл', kz: '+1 ұпай' },
-                        feedbackDesc: { ru: 'Твердый отказ по правилам.', kz: 'Ережеге сай нақты бас тарту.' }
-                    },
-                    {
-                        text: { ru: 'Садитесь тихонько, сейчас сделаем.', kz: 'Ақырын отырыңыз, қазір жасаймыз.' },
-                        isCorrect: false,
-                        feedbackTitle: { ru: 'Нарушение ТБ', kz: 'Қауіпсіздікті бұзу' },
-                        feedbackDesc: { ru: 'Строго запрещено обслуживать нетрезвых.', kz: 'Мас адамдарға қызмет көрсетуге қатаң тыйым салынады.' }
-                    },
-                    {
-                        text: { ru: 'Сделать снимок, но взять двойную оплату за риск.', kz: 'Суретке түсіру, бірақ тәуекел үшін екі есе ақы алу.' },
-                        isCorrect: false,
-                        feedbackTitle: { ru: 'Нарушение закона', kz: 'Заң бұзушылық' },
-                        feedbackDesc: { ru: 'Вымогательство недопустимо.', kz: 'Ақша бопсалауға жол берілмейді.' }
-                    }
+                    { text: { ru: 'Фу, вы пьяны! Вон отсюда!', kz: 'Сіз массыз! Кетіңіз!' }, isCorrect: false, feedbackTitle: { ru: '❌ Агрессия', kz: '❌ Агрессия' }, feedbackDesc: { ru: 'Риск драки.', kz: 'Төбелес қаупі.' } },
+                    { text: { ru: 'Извините, но по регламенту безопасности мы не обслуживаем пациентов в состоянии опьянения. Ждем вас завтра!', kz: 'Кешіріңіз, қауіпсіздік ережесі бойынша мас адамдарға қызмет көрсетілмейді. Ертең күтеміз!' }, isCorrect: true, feedbackTitle: { ru: '🌟 Стандарт ТБ', kz: '🌟 Қауіпсіздік стандарты' }, feedbackDesc: { ru: 'Вежливый, но твердый отказ со ссылкой на регламент.', kz: 'Ережеге сүйеніп сыпайы бас тарту.' } },
+                    { text: { ru: 'Ладно, садитесь тихо.', kz: 'Жарайды, ақырын отырыңыз.' }, isCorrect: false, feedbackTitle: { ru: '❌ Нарушение ТБ', kz: '❌ Қауіпсіздікті бұзу' }, feedbackDesc: { ru: 'Опасно для оборудования и персонала.', kz: 'Аппарат пен персоналға қауіпті.' } },
+                    { text: { ru: 'Сделать за двойную цену.', kz: 'Екі есе бағаға түсіру.' }, isCorrect: false, feedbackTitle: { ru: '❌ Преступление', kz: '❌ Қылмыс' }, feedbackDesc: { ru: 'Вымогательство.', kz: 'Заңсыз ақша талап ету.' } }
                 ]
             },
+            // 8
             {
                 type: 'chat', avatar: '📱',
-                name: { ru: 'Чат (WhatsApp)', kz: 'Чат (WhatsApp)' },
-                dialogue: { 
-                    ru: 'Сколько стоит КТ зубов и можно ли записаться на 15:00?', 
-                    kz: 'Тіс КТ қанша тұрады және сағат 15:00-ге жазылуға бола ма?' 
-                },
+                name: { ru: 'WhatsApp Чат', kz: 'WhatsApp Чат' },
+                dialogue: { ru: 'Сколько стоит КТ зубов и можно ли записаться на 15:00?', kz: 'Тіс КТ қанша тұрады және 15:00-ге жазылуға бола ма?' },
                 choices: [
-                    {
-                        text: { ru: 'КТ стоит 15600. Записи нет.', kz: 'КТ 15600 тұрады. Жазылу жоқ.' },
-                        isCorrect: false,
-                        feedbackTitle: { ru: 'Отписка', kz: 'Құрғақ жауап' },
-                        feedbackDesc: { ru: 'Нет приветствия.', kz: 'Сәлемдесу жоқ.' }
-                    },
-                    {
-                        text: { ru: '15600 тг. Приходите к 15:00.', kz: '15600 тг. 15:00-де келіңіз.' },
-                        isCorrect: false,
-                        feedbackTitle: { ru: 'Дезинформация', kz: 'Жалған ақпарат' },
-                        feedbackDesc: { ru: 'Вы не объяснили про живую очередь.', kz: 'Сіз тірі кезек туралы түсіндірмедіңіз.' }
-                    },
-                    {
-                        text: { ru: 'Не отвечать, пока пациент сам не позвонит.', kz: 'Пациент өзі қоңырау шалғанша жауап бермеу.' },
-                        isCorrect: false,
-                        feedbackTitle: { ru: 'Игнорирование', kz: 'Елемеу' },
-                        feedbackDesc: { ru: 'Вы потеряли пациента.', kz: 'Сіз пациентті жоғалттыңыз.' }
-                    },
-                    {
-                        text: { ru: 'Здравствуйте! КТ — 15 600 тг. Прием в порядке живой очереди. Ждем вас до 20:00! Подсказать адрес?', kz: 'Сәлеметсіз бе! КТ — 15 600 тг. Қабылдау тірі кезек тәртібімен өтеді. Сізді 20:00-ге дейін күтеміз! Мекенжайды айтайын ба?' },
-                        isCorrect: true,
-                        feedbackTitle: { ru: '+1 балл', kz: '+1 ұпай' },
-                        feedbackDesc: { ru: 'Забота в тексте.', kz: 'Мәтіндегі қамқорлық.' }
-                    }
+                    { text: { ru: '15600. Записи нет, живая очередь.', kz: '15600. Жазылу жоқ, тірі кезек.' }, isCorrect: false, feedbackTitle: { ru: '❌ Отписка', kz: '❌ Құрғақ жауап' }, feedbackDesc: { ru: 'Нет приветствия и сервиса.', kz: 'Сәлемдесу жоқ.' } },
+                    { text: { ru: 'Здравствуйте! КТ обеих челюстей — 15 600 тг. Прием в порядке живой очереди до 20:00. Подсказать адрес?', kz: 'Сәлеметсіз бе! КТ — 15 600 тг. Қабылдау тірі кезекпен 20:00-ге дейін. Мекенжайды айтайын ба?' }, isCorrect: true, feedbackTitle: { ru: '🌟 Идеальный скрипт', kz: '🌟 Керемет скрипт' }, feedbackDesc: { ru: 'Приветствие + Ответ на 2 вопроса + Приглашение + Открытый вопрос.', kz: 'Барлық сұраққа толық жауап.' } },
+                    { text: { ru: 'Приходите к 15:00.', kz: '15:00-де келіңіз.' }, isCorrect: false, feedbackTitle: { ru: '❌ Обман', kz: '❌ Жалған сөз' }, feedbackDesc: { ru: 'Пациент подумает, что забронировал время.', kz: 'Пациент уақытқа жазылдым деп ойлайды.' } },
+                    { text: { ru: 'Игнорировать сообщение.', kz: 'Жауап бермеу.' }, isCorrect: false, feedbackTitle: { ru: '❌ Игнор', kz: '❌ Елемеу' }, feedbackDesc: { ru: 'Слив лида.', kz: 'Клиентті жоғалту.' } }
                 ]
             },
+            // 9
             {
-                type: 'earthquake', avatar: '🚨',
-                name: { ru: 'ЗЕМЛЕТРЯСЕНИЕ', kz: 'ЖЕР СІЛКІНІСІ' },
-                dialogue: { 
-                    ru: '(Здание трясет. Пациент внутри КТ)', 
-                    kz: '(Ғимарат сілкінуде. Пациент КТ ішінде)' 
-                },
+                type: 'earthquake', avatar: '🚨', timer: 15,
+                name: { ru: '🚨 ЧС: ЗЕМЛЕТРЯСЕНИЕ!', kz: '🚨 ТЖ: ЖЕР СІЛКІНІСІ!' },
+                dialogue: { ru: '(Здание мощно трясет! Пациент стоит внутри КТ-аппарата!)', kz: '(Ғимарат қатты сілкінуде! Пациент КТ аппаратының ішінде!)' },
                 choices: [
-                    {
-                        text: { ru: 'Сказать пациенту не шевелиться.', kz: 'Пациентке қозғалмауын айту.' },
-                        isCorrect: false,
-                        feedbackTitle: { ru: 'Опасность', kz: 'Қауіпті' },
-                        feedbackDesc: { ru: 'Жизнь важнее снимка.', kz: 'Өмір суреттен маңыздырақ.' }
-                    },
-                    {
-                        text: { ru: 'Бросить всё и убежать на улицу спасать себя.', kz: 'Бәрін тастап, өзін құтқару үшін далаға қашу.' },
-                        isCorrect: false,
-                        feedbackTitle: { ru: 'Оставление в опасности', kz: 'Қауіпте қалдыру' },
-                        feedbackDesc: { ru: 'Вы не имеете права бросать пациента в аппарате.', kz: 'Пациентті аппаратта тастап кетуге құқығыңыз жоқ.' }
-                    },
-                    {
-                        text: { ru: 'Остановить скан, вывести пациента и встать в безопасное место или покинуть здание.', kz: 'Сканерлеуді тоқтатып, пациентті шығарып, қауіпсіз жерге тұру немесе ғимараттан шығу.' },
-                        isCorrect: true,
-                        feedbackTitle: { ru: '+1 балл. ЧС', kz: '+1 ұпай. ТЖ' },
-                        feedbackDesc: { ru: 'Правильные действия.', kz: 'Дұрыс әрекеттер.' }
-                    },
-                    {
-                        text: { ru: 'Продолжать процедуру, надеясь, что всё обойдется.', kz: 'Бәрі жақсы болады деп үміттеніп, процедураны жалғастыру.' },
-                        isCorrect: false,
-                        feedbackTitle: { ru: 'Фатальная ошибка', kz: 'Үлкен қателік' },
-                        feedbackDesc: { ru: 'Здание может обрушиться.', kz: 'Ғимарат құлауы мүмкін.' }
-                    }
+                    { text: { ru: 'Сказать пациенту не шевелиться, чтобы не испортить снимок.', kz: 'Сурет бүлінбес үшін пациентке қозғалмауын айту.' }, isCorrect: false, feedbackTitle: { ru: '❌ Опасность для жизни', kz: '❌ Өмірге қауіпті' }, feedbackDesc: { ru: 'Аппарат может упасть на человека.', kz: 'Аппарат адамға құлауы мүмкін.' } },
+                    { text: { ru: 'Остановить томограф, вывести пациента в безопасную зону (несущие стены) или на улицу.', kz: 'Аппаратты тоқтатып, пациентті қауіпсіз жерге немесе далаға алып шығу.' }, isCorrect: true, feedbackTitle: { ru: '🌟 Герой спасатель', kz: '🌟 Құтқарушы' }, feedbackDesc: { ru: 'Жизнь человека всегда на 1 месте.', kz: 'Адам өмірі әрдайым 1-орында.' } },
+                    { text: { ru: 'Убежать на улицу самому.', kz: 'Өзің далаға қашып кету.' }, isCorrect: false, feedbackTitle: { ru: '❌ Предательство', kz: '❌ Сатқындық' }, feedbackDesc: { ru: 'Бросили пациента в беде.', kz: 'Пациентті қауіпте қалдырдыңыз.' } },
+                    { text: { ru: 'Паниковать и кричать.', kz: 'Дүрбелеңге түсу.' }, isCorrect: false, feedbackTitle: { ru: '❌ Паника', kz: '❌ Дүрбелең' }, feedbackDesc: { ru: 'Паника убивает.', kz: 'Дүрбелең өмірге қауіпті.' } }
                 ]
             },
+            // 10
             {
-                type: 'fire', avatar: '🔥',
-                name: { ru: 'ПОЖАР', kz: 'ӨРТ' },
-                dialogue: { 
-                    ru: '(Запахло гарью, сработала тревога).', 
-                    kz: '(Түтін иісі шықты, дабыл іске қосылды).' 
-                },
+                type: 'fire', avatar: '🔥', timer: 15,
+                name: { ru: '🔥 ЧС: ПОЖАРНАЯ ТРЕВОГА!', kz: '🔥 ТЖ: ӨРТ ДАБЫЛЫ!' },
+                dialogue: { ru: '(Запахло дымом, сработала громкая сирена!)', kz: '(Түтін иісі шықты, дабыл айқайлап жатыр!)' },
                 choices: [
-                    {
-                        text: { ru: 'Закрыть дверь и продолжить.', kz: 'Есікті жауып, жұмысты жалғастыру.' },
-                        isCorrect: false,
-                        feedbackTitle: { ru: 'Смертельная ошибка', kz: 'Өте қауіпті қате' },
-                        feedbackDesc: { ru: 'Игнорировать тревогу нельзя.', kz: 'Дабылды елемеуге болмайды.' }
-                    },
-                    {
-                        text: { ru: 'Прекратить работу, эвакуировать людей, вызвать 101.', kz: 'Жұмысты тоқтатып, адамдарды эвакуациялау, 101 шақыру.' },
-                        isCorrect: true,
-                        feedbackTitle: { ru: '+1 балл. ЧС', kz: '+1 ұпай. ТЖ' },
-                        feedbackDesc: { ru: 'Эвакуация — приоритет.', kz: 'Эвакуация — бірінші кезекте.' }
-                    },
-                    {
-                        text: { ru: 'Побежать искать источник дыма, оставив пациента.', kz: 'Пациентті қалдырып, түтіннің көзін іздеуге жүгіру.' },
-                        isCorrect: false,
-                        feedbackTitle: { ru: 'Нарушение протокола', kz: 'Хаттаманы бұзу' },
-                        feedbackDesc: { ru: 'Вы не пожарный.', kz: 'Сіз өрт сөндіруші емессіз.' }
-                    },
-                    {
-                        text: { ru: 'Включить вытяжку на максимум и продолжить работу.', kz: 'Желдеткішті барынша қосып, жұмысты жалғастыру.' },
-                        isCorrect: false,
-                        feedbackTitle: { ru: 'Глупость', kz: 'Ақымақтық' },
-                        feedbackDesc: { ru: 'Вытяжка усилит приток кислорода к огню.', kz: 'Желдеткіш отқа оттегінің келуін күшейтеді.' }
-                    }
+                    { text: { ru: 'Закрыть дверь и закончить снимок.', kz: 'Есікті жауып, суретті аяқтау.' }, isCorrect: false, feedbackTitle: { ru: '❌ Смертельная ошибка', kz: '❌ Қауіпті қате' }, feedbackDesc: { ru: 'Дым отравит вас за 2 минуты.', kz: 'Түтін тұншықтырады.' } },
+                    { text: { ru: 'Экстренно эвакуировать пациентов через аварийный выход и вызвать 101!', kz: 'Пациенттерді апаттық есіктен эвакуациялап, 101 шақыру!' }, isCorrect: true, feedbackTitle: { ru: '🌟 Четкий протокол', kz: '🌟 Нақты хаттама' }, feedbackDesc: { ru: 'Быстрая эвакуация спасает жизни.', kz: 'Тез эвакуация өмірді құтқарады.' } },
+                    { text: { ru: 'Искать где горит.', kz: 'Өртті іздеуге жүгіру.' }, isCorrect: false, feedbackTitle: { ru: '❌ Ошибка', kz: '❌ Қате' }, feedbackDesc: { ru: 'Вы не пожарный.', kz: 'Сіз өрт сөндіруші емессіз.' } },
+                    { text: { ru: 'Включить вентилятор.', kz: 'Желдеткішті қосу.' }, isCorrect: false, feedbackTitle: { ru: '❌ Абсурд', kz: '❌ Сандырақ' }, feedbackDesc: { ru: 'Воздух раздует пламя.', kz: 'Ауа өртті күшейтеді.' } }
                 ]
             },
+            // 11
             {
-                type: 'medical', avatar: '😵',
-                name: { ru: 'Елена (Обморок)', kz: 'Елена (Талып қалу)' },
-                dialogue: { 
-                    ru: 'Девушка, мне что-то душно... в глазах темнеет... (падает в обморок)', 
-                    kz: 'Қарындас, маған ауа жетпей тұр... көзім қарауытып кетті... (талып қалады)' 
-                },
+                type: 'medical', avatar: '😵', timer: 15,
+                name: { ru: '🚑 НЕОТЛОЖКА: ОБМОРОК', kz: '🚑 ЖЕДЕЛ КӨМЕК: ТАЛЫП ҚАЛУ' },
+                dialogue: { ru: 'Мне что-то душно... в глазах темнеет... (пациент упал без сознания!)', kz: 'Ауа жетпей тұр... көзім қарауытты... (пациент талып құлады!)' },
                 choices: [
-                    {
-                        text: { ru: 'Похлопать по щекам и дать понюхать спирт.', kz: 'Жағынан ұрып, спирт иіскету.' },
-                        isCorrect: false,
-                        feedbackTitle: { ru: 'Неэффективно', kz: 'Тиімсіз' },
-                        feedbackDesc: { ru: 'Нужно восстановить кровоток к мозгу.', kz: 'Миға қан ағымын қалпына келтіру қажет.' }
-                    },
-                    {
-                        text: { ru: 'Усадить на стул и дать попить воды.', kz: 'Орындыққа отырғызып, су беру.' },
-                        isCorrect: false,
-                        feedbackTitle: { ru: 'Опасно', kz: 'Қауіпті' },
-                        feedbackDesc: { ru: 'В положении сидя кровь не поступает в мозг, человек может подавиться водой.', kz: 'Отырған күйде қан миға бармайды, суға шашалуы мүмкін.' }
-                    },
-                    {
-                        text: { ru: 'Уложить, приподнять ноги, обеспечить воздух и дать понюхать нашатырь.', kz: 'Жатқызып, аяғын көтеру, ауамен қамтамасыз етіп, мүсәтір иіскету.' },
-                        isCorrect: true,
-                        feedbackTitle: { ru: '+1 балл. Первая помощь', kz: '+1 ұпай. Алғашқы көмек' },
-                        feedbackDesc: { ru: 'Приподнятые ноги возвращают кровь к голове.', kz: 'Көтерілген аяқтар қанды басқа қайтарады.' }
-                    },
-                    {
-                        text: { ru: 'Побежать искать врача, оставив пациентку одну.', kz: 'Пациентті жалғыз қалдырып, дәрігерді іздеуге жүгіру.' },
-                        isCorrect: false,
-                        feedbackTitle: { ru: 'Оставление пациента', kz: 'Пациентті қалдырып кету' },
-                        feedbackDesc: { ru: 'Звать на помощь нужно громким голосом, не отходя от пациента.', kz: 'Көмекке пациенттің жанынан кетпей, қатты дауыспен шақыру керек.' }
-                    }
+                    { text: { ru: 'Похлопать по щекам и полить водой.', kz: 'Бетінен ұрып, су шашу.' }, isCorrect: false, feedbackTitle: { ru: '❌ Неэффективно', kz: '❌ Тиімсіз' }, feedbackDesc: { ru: 'Нужно пригнать кровь к мозгу.', kz: 'Қанды миға айдау керек.' } },
+                    { text: { ru: 'Уложить на спину, приподнять ноги выше уровня головы, обеспечить приток воздуха, давать нашатырь.', kz: 'Арқасына жатқызып, аяғын басынан жоғары көтеру, ауа келтіру, мүсәтір иіскету.' }, isCorrect: true, feedbackTitle: { ru: '🌟 Спасатель', kz: '🌟 Алғашқы көмек' }, feedbackDesc: { ru: 'Подъем ног возвращает кровоток к мозгу!', kz: 'Аяқты көтеру қанды басқа қайтарады!' } },
+                    { text: { ru: 'Усадить на стул.', kz: 'Орындыққа отырғызу.' }, isCorrect: false, feedbackTitle: { ru: '❌ Опасно', kz: '❌ Қауіпті' }, feedbackDesc: { ru: 'В положении сидя мозг голодает.', kz: 'Отырғанда миға қан бармайды.' } },
+                    { text: { ru: 'Убежать за врачом.', kz: 'Дәрігерге қашып кету.' }, isCorrect: false, feedbackTitle: { ru: '❌ Бросили', kz: '❌ Қалдырып кету' }, feedbackDesc: { ru: 'Нельзя оставлять без присмотра.', kz: 'Жалғыз қалдыруға болмайды.' } }
                 ]
             },
+            // 12
             {
-                type: 'medical', avatar: '💔',
-                name: { ru: 'Пациент (Остановка сердца)', kz: 'Пациент (Жүректің тоқтауы)' },
-                dialogue: { 
-                    ru: '(Мужчина в коридоре теряет сознание, не дышит, пульса нет)', 
-                    kz: '(Ер адам есінен танып, тыныс алмайды, пульс жоқ)' 
-                },
+                type: 'medical', avatar: '💔', timer: 15,
+                name: { ru: '🚑 НЕОТЛОЖКА: ОСТАНОВКА СЕРДЦА', kz: '🚑 ЖЕДЕЛ КӨМЕК: ЖҮРЕК ТОҚТАУЫ' },
+                dialogue: { ru: '(Пациент в холле упал, не дышит, пульса на сонной артерии нет!)', kz: '(Пациент құлады, тыныс алмайды, пульс жоқ!)' },
                 choices: [
-                    {
-                        text: { ru: 'Ждать, пока он сам очнется.', kz: 'Өзі оянғанша күту.' },
-                        isCorrect: false,
-                        feedbackTitle: { ru: 'Потеря времени', kz: 'Уақыт жоғалту' },
-                        feedbackDesc: { ru: 'При отсутствии дыхания счет идет на секунды.', kz: 'Тыныс алу болмаған кезде әр секунд маңызды.' }
-                    },
-                    {
-                        text: { ru: 'Попытаться засунуть таблетку в рот.', kz: 'Аузына дәрі салуға тырысу.' },
-                        isCorrect: false,
-                        feedbackTitle: { ru: 'Смертельно опасно', kz: 'Өте қауіпті' },
-                        feedbackDesc: { ru: 'Человек без сознания задохнется от таблетки.', kz: 'Ессіз адам дәріге шашалып қалады.' }
-                    },
-                    {
-                        text: { ru: 'Немедленно вызвать скорую (103), позвать врача и начать непрямой массаж сердца (СЛР).', kz: 'Дереу жедел жәрдем шақыру (103), дәрігерді шақырып, жүрекке жанама массаж (ЖӨР) бастау.' },
-                        isCorrect: true,
-                        feedbackTitle: { ru: '+1 балл. Спасение', kz: '+1 ұпай. Құтқару' },
-                        feedbackDesc: { ru: 'Экстренный вызов и реанимация обязательны.', kz: 'Жедел шақыру және реанимация міндетті.' }
-                    },
-                    {
-                        text: { ru: 'Громко кричать "Помогите!" и бегать в панике вокруг.', kz: 'Қатты айқайлап "Көмектесіңдер!" деп дүрбелеңге түсіп айнала жүгіру.' },
-                        isCorrect: false,
-                        feedbackTitle: { ru: 'Паника', kz: 'Дүрбелең' },
-                        feedbackDesc: { ru: 'Сотрудник клиники должен действовать по алгоритму.', kz: 'Клиника қызметкері алгоритм бойынша әрекет етуі керек.' }
-                    }
+                    { text: { ru: 'Ждать скорую и ничего не делать.', kz: 'Жедел жәрдемді күтіп отыру.' }, isCorrect: false, feedbackTitle: { ru: '❌ Смерть', kz: '❌ Өлім' }, feedbackDesc: { ru: 'Мозг умрет через 5 минут.', kz: 'Ми 5 минутта өледі.' } },
+                    { text: { ru: 'Засунуть таблетку в рот.', kz: 'Аузына дәрі салу.' }, isCorrect: false, feedbackTitle: { ru: '❌ Удушье', kz: '❌ Тұншығу' }, feedbackDesc: { ru: 'Заблокируете дыхательные пути.', kz: 'Тыныс жолын жабасыз.' } },
+                    { text: { ru: 'Вызвать 103, громко крикнуть ВРАЧА и немедленно начать СЛР (30 нажатий на грудину / 2 вдоха).', kz: '103 шақыру, ДӘРІГЕРДІ айқайлап шақыру және ЖӨР (30 басу / 2 үрлеу) бастау.' }, isCorrect: true, feedbackTitle: { ru: '🌟 Настоящий медик', kz: '🌟 Нағыз медик' }, feedbackDesc: { ru: 'Непрямой массаж сердца спасает жизнь до приезда 103!', kz: 'Жүрек массажы өмірді құтқарады!' } },
+                    { text: { ru: 'Дать понюхать спирт.', kz: 'Спирт иіскету.' }, isCorrect: false, feedbackTitle: { ru: '❌ Бесполезно', kz: '❌ Пайдасыз' }, feedbackDesc: { ru: 'При остановке сердца это не работает.', kz: 'Бұл жүректі іске қоспайды.' } }
                 ]
             },
+            // 13
             {
                 type: 'zen', avatar: '🤬',
-                name: { ru: 'Клиент (Оскорбляет)', kz: 'Клиент (Балағаттайды)' },
-                dialogue: { 
-                    ru: 'Ты вообще соображаешь?! Сидишь тут бестолковая, только кнопки нажимать умеешь!', 
-                    kz: 'Сен өзің не істеп отырғаныңды түсінесің бе?! Осында түк білмейтін отырсың, тек түйме басуды білесің!' 
-                },
+                name: { ru: 'Психология: Хамство', kz: 'Психология: Дөрекілік' },
+                dialogue: { ru: 'Ты вообще бестолковая! Только кнопки нажимать умеешь, овца!', kz: 'Сен түк білмейсің! Тек түйме баса аласың!' },
                 choices: [
-                    {
-                        text: { ru: 'Сами вы бестолковый! Я с высшим образованием вообще-то!', kz: 'Өзіңіз түк білмейсіз! Мен жоғары білімдімін!' },
-                        isCorrect: false,
-                        feedbackTitle: { ru: 'Провал', kz: 'Сәтсіздік' },
-                        feedbackDesc: { ru: 'Вы приняли слова на свой счет и раздули скандал.', kz: 'Сіз сөздерді жеке қабылдап, жанжалды үлкейттіңіз.' }
-                    },
-                    {
-                        text: { ru: 'Вдохнуть. Напомнить себе: "Он злится на ситуацию/свою боль, а не на меня". Ответить спокойно.', kz: 'Дем алу. Өзіне ескерту: "Ол маған емес, жағдайға/ауруына ашулы". Сабырлы жауап беру.' },
-                        isCorrect: true,
-                        feedbackTitle: { ru: '+1 балл. Психология', kz: '+1 ұпай. Психология' },
-                        feedbackDesc: { ru: 'Вы отделили личность от ситуации. Это признак профессионала.', kz: 'Сіз жеке басыңызды жағдайдан бөлдіңіз.' }
-                    },
-                    {
-                        text: { ru: 'Отказать в приеме и выгнать с криками.', kz: 'Қабылдаудан бас тартып, айқайлап қуып шығу.' },
-                        isCorrect: false,
-                        feedbackTitle: { ru: 'Агрессия', kz: 'Агрессия' },
-                        feedbackDesc: { ru: 'Отказать можно, но только спокойно и без криков.', kz: 'Бас тартуға болады, бірақ айқайсыз.' }
-                    },
-                    {
-                        text: { ru: 'Молча развернуться и уйти в подсобку, бросив пациента.', kz: 'Үндемей бұрылып, пациентті тастап, қосалқы бөлмеге кетіп қалу.' },
-                        isCorrect: false,
-                        feedbackTitle: { ru: 'Побег от проблемы', kz: 'Мәселеден қашу' },
-                        feedbackDesc: { ru: 'Это спровоцирует жалобу руководству.', kz: 'Бұл басшылыққа шағым түсуіне әкеледі.' }
-                    }
+                    { text: { ru: 'Сам ты овца! У меня высшее образование!', kz: 'Өзің ақымақсың! Менің білімім бар!' }, isCorrect: false, feedbackTitle: { ru: '❌ Срыв', kz: '❌ Ұрыс' }, feedbackDesc: { ru: 'Опустились до уровня хама.', kz: 'Дөрекілікке дөрекілікпен жауап бердіңіз.' } },
+                    { text: { ru: 'Сделать вдох. Понять: "Он злится на свою боль/болезнь, а не на меня". Ответить спокойно по делу.', kz: 'Терең дем алу. "Ол маған емес, ауруына ашулы" деп түсіну. Сабырлы жауап беру.' }, isCorrect: true, feedbackTitle: { ru: '🌟 Дзен-Мастер', kz: '🌟 Психологиялық қалқан' }, feedbackDesc: { ru: 'Эмоциональный щит: Не принимаем чужой негатив на свой счет!', kz: 'Бөгде негативті жеке басыңызға қабылдамау.' } },
+                    { text: { ru: 'Заплакать и уехать домой.', kz: 'Жылап үйге кету.' }, isCorrect: false, feedbackTitle: { ru: '❌ Слабость', kz: '❌ Әлсіздік' }, feedbackDesc: { ru: 'Нервный срыв.', kz: 'Жүйке сыр беруі.' } },
+                    { text: { ru: 'Вызвать драку.', kz: 'Төбелес шығару.' }, isCorrect: false, feedbackTitle: { ru: '❌ Криминал', kz: '❌ Қылмыс' }, feedbackDesc: { ru: 'Увольнение.', kz: 'Жұмыстан босату.' } }
                 ]
             },
+            // 14
             {
                 type: 'zen', avatar: '🧘‍♀️',
-                name: { ru: 'Внутренний голос', kz: 'Ішкі дауыс' },
-                dialogue: { 
-                    ru: '(Смена была тяжелой. Вы чувствуете истощение и обиду)', 
-                    kz: '(Ауысым ауыр болды. Сіз шаршаған және ренжігендей сезінесіз)' 
-                },
+                name: { ru: 'Психология: Конец смены', kz: 'Психология: Ауысым соңы' },
+                dialogue: { ru: '(Смена была ужасной, клиенты ругались. Вы истощены...)', kz: '(Ауысым өте ауыр болды. Сіз шаршадыңыз...)' },
                 choices: [
-                    {
-                        text: { ru: 'Прокручивать диалоги: "А надо было ему вот так ответить!"', kz: 'Диалогтарды ойлау: "Оған былай жауап беру керек еді!"' },
-                        isCorrect: false,
-                        feedbackTitle: { ru: 'Выгорание', kz: 'Күйіп кету' },
-                        feedbackDesc: { ru: 'Это прямой путь к нервному срыву.', kz: 'Бұл жүйке жұқаруына апаратын тікелей жол.' }
-                    },
-                    {
-                        text: { ru: 'Умыться холодной водой, сделать глубокие вдохи и осознанно "оставить" рабочий негатив.', kz: 'Салқын сумен жуынып, терең дем алып, жұмыстағы негативті саналы түрде қалдыру.' },
-                        isCorrect: true,
-                        feedbackTitle: { ru: '+1 балл. Самозабота', kz: '+1 ұпай. Өз-өзіне күтім' },
-                        feedbackDesc: { ru: 'Физический сброс стресса помогает не нести его домой.', kz: 'Стрессті физикалық түрде тастау оны үйге апармауға көмектеседі.' }
-                    },
-                    {
-                        text: { ru: 'Сорвать злость на близких дома.', kz: 'Ашуды үйдегі жақындарынан алу.' },
-                        isCorrect: false,
-                        feedbackTitle: { ru: 'Токсичность', kz: 'Уыттылық' },
-                        feedbackDesc: { ru: 'Ваша семья не виновата в рабочих проблемах.', kz: 'Жұмыстағы қиындықтарға отбасыңыз кінәлі емес.' }
-                    },
-                    {
-                        text: { ru: 'Написать гневный пост в соцсетях про "ужасных пациентов".', kz: 'Әлеуметтік желіде "нашар пациенттер" туралы ашулы жазба жариялау.' },
-                        isCorrect: false,
-                        feedbackTitle: { ru: 'Нарушение этики', kz: 'Этиканы бұзу' },
-                        feedbackDesc: { ru: 'Вы можете испортить репутацию клиники и потерять работу.', kz: 'Сіз клиниканың беделін түсіріп, жұмысыңыздан айырылуыңыз мүмкін.' }
-                    }
+                    { text: { ru: 'Крутить в голове обиды весь вечер дома.', kz: 'Кеш бойы үйде ренішті ойлай беру.' }, isCorrect: false, feedbackTitle: { ru: '❌ Выгорание', kz: '❌ Күйіп кету' }, feedbackDesc: { ru: 'Путь к депрессии.', kz: 'Депрессияға апарады.' } },
+                    { text: { ru: 'Умыться холодной водой, сделать выдох и "оставить" проблемы работы на работе.', kz: 'Салқын сумен жуынып, дем шығарып, жұмыс мәселесін жұмыста қалдыру.' }, isCorrect: true, feedbackTitle: { ru: '🌟 Психогигиена', kz: '🌟 Психогигиена' }, feedbackDesc: { ru: 'Разделение работы и личной жизни бережет нервы!', kz: 'Жұмыс пен жеке өмірді бөлу.' } },
+                    { text: { ru: 'Сорваться на семью.', kz: 'Отбасына ашулану.' }, isCorrect: false, feedbackTitle: { ru: '❌ Токсичность', kz: '❌ Токсиктік' }, feedbackDesc: { ru: 'Семья не виновата.', kz: 'Үйдегілер кінәлі емес.' } },
+                    { text: { ru: 'Написать злой пост в соцсетях.', kz: 'Желіде ашулы пост жазу.' }, isCorrect: false, feedbackTitle: { ru: '❌ Штраф', kz: '❌ Айыппұл' }, feedbackDesc: { ru: 'Нарушение корпоративной этики.', kz: 'Корпоративтік этиканы бұзу.' } }
                 ]
             },
+            // 15
             {
                 type: 'post', avatar: '🙂',
-                name: { ru: 'Дмитрий (После снимка)', kz: 'Дмитрий (Суреттен кейін)' },
-                dialogue: { 
-                    ru: 'Всё готово? А как мне забрать результаты?', 
-                    kz: 'Бәрі дайын ба? Нәтижелерді қалай алсам болады?' 
-                },
+                name: { ru: 'Дмитрий (Финал)', kz: 'Дмитрий (Финал)' },
+                dialogue: { ru: 'Спасибо, снимок сделали! А где забрать результаты?', kz: 'Рахмет, суретті түсірдік! Нәтижені қайдан аламын?' },
                 choices: [
-                    {
-                        text: { ru: 'Вот ваш диск. До свидания.', kz: 'Міне дискіңіз. Сау болыңыз.' },
-                        isCorrect: false,
-                        feedbackTitle: { ru: 'Упущенная возможность', kz: 'Жіберіп алған мүмкіндік' },
-                        feedbackDesc: { ru: 'Забыли попросить отзыв.', kz: 'Пікір сұрауды ұмыттыңыз.' }
-                    },
-                    {
-                        text: { ru: 'Молча протянуть диск и отвернуться.', kz: 'Дискіні үндемей беріп, теріс айналу.' },
-                        isCorrect: false,
-                        feedbackTitle: { ru: 'Невежливость', kz: 'Сыпайы емес' },
-                        feedbackDesc: { ru: 'Пациент уйдет с плохим настроением.', kz: 'Пациент нашар көңіл-күймен кетеді.' }
-                    },
-                    {
-                        text: { ru: 'Ваш диск готов! Спасибо, что выбрали нас. Будем благодарны за отзыв в 2ГИС!', kz: 'Дискіңіз дайын! Бізді таңдағаныңызға рахмет. 2ГИС-те пікір қалдырсаңыз риза боламыз!' },
-                        isCorrect: true,
-                        feedbackTitle: { ru: '+1 балл. Финал', kz: '+1 ұпай. Мәре' },
-                        feedbackDesc: { ru: 'Вежливо выдали и попросили отзыв.', kz: 'Сыпайы түрде пікір сұрадыңыз.' }
-                    },
-                    {
-                        text: { ru: 'Положить диск на стойку и пойти в телефон.', kz: 'Дискіні үстелге қойып, телефонға кіріп кету.' },
-                        isCorrect: false,
-                        feedbackTitle: { ru: 'Игнорирование', kz: 'Елемеу' },
-                        feedbackDesc: { ru: 'Пациент почувствует неуважение.', kz: 'Пациент өзіне құрметсіздікті сезінеді.' }
-                    }
+                    { text: { ru: 'Вот диск. Пока.', kz: 'Міне диск. Сау бол.' }, isCorrect: false, feedbackTitle: { ru: '❌ Сухо', kz: '❌ Құрғақ' }, feedbackDesc: { ru: 'Забыли про 2ГИС.', kz: '2ГИС ұмыт қалды.' } },
+                    { text: { ru: 'Ваш диск готов! Спасибо за визит. Если вам понравился сервис, будем очень благодарны за отзыв в 2ГИС! До свидания!', kz: 'Дискіңіз дайын! Келгеніңізге рахмет. Қызмет ұнаса, 2ГИС-те пікір қалдырсаңыз риза боламыз!' }, isCorrect: true, feedbackTitle: { ru: '🌟 5 Звезд в 2ГИС', kz: '🌟 2ГИС-те 5 жұлдыз' }, feedbackDesc: { ru: 'Вежливый сбор 5-звездочных отзывов перекрывает весь негатив!', kz: 'Жақсы пікірлер жинау жағымсыз пиғылды жабады!' } },
+                    { text: { ru: 'Напишите 5 звезд, а то шеф уволит.', kz: '5 жұлдыз қойыңызшы, әйтпесе бастық қуады.' }, isCorrect: false, feedbackTitle: { ru: '❌ Жалость', kz: '❌ Аяныш' }, feedbackDesc: { ru: 'Выпрашивание отзыва.', kz: 'Пікірді жалынып сұрау.' } },
+                    { text: { ru: 'Молча отдать диск.', kz: 'Үндемей бере салу.' }, isCorrect: false, feedbackTitle: { ru: '❌ Невежливо', kz: '❌ Сыпайы емес' }, feedbackDesc: { ru: 'Смазанное впечатление.', kz: 'Нашар әсер.' } }
                 ]
             }
         ];
@@ -786,10 +583,10 @@
         let currentStep = 0;
         let score = 0;
         let answersLog = [];
+        let timerInterval = null;
 
         function setLang(selectedLang) {
             lang = selectedLang;
-            
             document.getElementById('ui-welcome').innerText = UI[lang].welcome;
             document.getElementById('ui-login-desc').innerText = UI[lang].loginDesc;
             document.getElementById('fio-input').placeholder = UI[lang].placeholder;
@@ -812,7 +609,7 @@
                 return;
             }
             currentUser = input.value.trim();
-            document.getElementById('user-display').innerText = currentUser;
+            document.getElementById('user-display').innerText = '👤 ' + currentUser;
             answersLog = [];
             
             document.getElementById('login-screen').classList.remove('active');
@@ -822,34 +619,70 @@
         }
 
         function loadScenario() {
+            clearInterval(timerInterval);
             const sc = scenarios[currentStep];
             const env = document.getElementById('clinic-env');
+            const patientBox = document.getElementById('patient-box');
             const avatar = document.getElementById('patient-avatar');
+            const patienceFill = document.getElementById('patience-fill');
+            const timerBar = document.getElementById('timer-bar');
             
-            env.classList.remove('shake-effect', 'fire-effect', 'medical-effect', 'zen-effect');
-            
-            // --- СБРОС И ПРАВИЛЬНАЯ ОТРИСОВКА ЭМОДЗИ ---
-            avatar.style.transition = 'none'; 
-            avatar.classList.remove('walk-in');
-            void avatar.offsetWidth; 
-
+            // Сброс окружения
+            env.className = 'viewport-3d';
             if (sc.type === 'earthquake') env.classList.add('shake-effect');
             if (sc.type === 'fire') env.classList.add('fire-effect');
             if (sc.type === 'medical') env.classList.add('medical-effect');
             if (sc.type === 'zen') env.classList.add('zen-effect');
 
+            // Анимация входа пациента + Звук шага
+            patientBox.classList.remove('walk-in');
+            patienceFill.style.width = '100%';
+            patienceFill.style.background = 'var(--success)';
+            
             setTimeout(() => {
-                avatar.textContent = sc.avatar; 
-                avatar.style.transition = 'left 0.8s ease-out, transform 0.3s'; 
-                avatar.classList.add('walk-in');
+                avatar.textContent = sc.avatar;
+                patientBox.classList.add('walk-in');
+                playSound('step');
             }, 100);
 
+            // Таймер для экстремальных ситуаций
+            if (sc.timer) {
+                timerBar.style.display = 'block';
+                timerBar.style.transform = 'scaleX(1)';
+                let timeLeft = sc.timer;
+                timerInterval = setInterval(() => {
+                    timeLeft -= 0.1;
+                    timerBar.style.transform = `scaleX(${timeLeft / sc.timer})`;
+                    if (sc.type === 'fire' || sc.type === 'earthquake') playSound('siren');
+                    if (timeLeft <= 0) {
+                        clearInterval(timerInterval);
+                        handleChoice({ isCorrect: false, feedbackTitle: { ru: '⏰ Время вышло!', kz: '⏰ Уақыт бітті!' }, feedbackDesc: { ru: 'В экстренной ситуации нельзя медлить!', kz: 'Шұғыл жағдайда бөгелмеңіз!' } });
+                    }
+                }, 100);
+            } else {
+                timerBar.style.display = 'none';
+            }
+
+            // Настройка UI
             document.getElementById('question-counter').innerText = `${UI[lang].sit} ${currentStep + 1} / ${scenarios.length}`;
             document.getElementById('progress-fill').style.width = `${((currentStep) / scenarios.length) * 100}%`;
-            
-            document.getElementById('patient-name').innerText = sc.name[lang];
-            document.getElementById('patient-dialogue').innerText = sc.dialogue[lang];
 
+            // Режим WhatsApp
+            const waBox = document.getElementById('whatsapp-box');
+            const dialogueCard = document.getElementById('dialogue-card');
+            
+            if (sc.type === 'chat') {
+                waBox.style.display = 'block';
+                dialogueCard.style.display = 'none';
+                document.getElementById('wa-text').innerText = sc.dialogue[lang];
+            } else {
+                waBox.style.display = 'none';
+                dialogueCard.style.display = 'block';
+                document.getElementById('patient-name').innerText = sc.name[lang];
+                document.getElementById('patient-dialogue').innerText = sc.dialogue[lang];
+            }
+
+            // Генерация вариантов
             const choicesContainer = document.getElementById('choices-container');
             choicesContainer.innerHTML = '';
             
@@ -858,28 +691,50 @@
             shuffledChoices.forEach(choice => {
                 const btn = document.createElement('button');
                 btn.className = 'choice-btn';
-                btn.innerText = choice.text[lang];
+                btn.innerHTML = `<span>🔹</span> <span>${choice.text[lang]}</span>`;
                 btn.onclick = () => handleChoice(choice);
                 choicesContainer.appendChild(btn);
             });
         }
 
         function handleChoice(choice) {
+            clearInterval(timerInterval);
             const modal = document.getElementById('feedback-modal');
             const icon = document.getElementById('fb-icon');
             const title = document.getElementById('fb-title');
             const desc = document.getElementById('fb-desc');
+            const patienceFill = document.getElementById('patience-fill');
+            const statusFloat = document.getElementById('status-float');
+            const avatar = document.getElementById('patient-avatar');
 
             answersLog[currentStep] = choice.isCorrect ? 1 : 0;
 
             if (choice.isCorrect) {
                 score++;
-                icon.innerText = '✅';
+                playSound('success');
+                icon.innerText = '🌟';
                 title.style.color = 'var(--success)';
+                patienceFill.style.width = '100%';
+                
+                statusFloat.innerText = '+100% Лояльность';
+                statusFloat.style.color = 'var(--success)';
+                statusFloat.classList.add('show');
             } else {
-                icon.innerText = '❌';
+                playSound('error');
+                icon.innerText = '⚠️';
                 title.style.color = 'var(--danger)';
+                patienceFill.style.width = '20%';
+                patienceFill.style.background = 'var(--danger)';
+                
+                avatar.style.transform = 'scale(1.2) rotate(10deg)';
+                setTimeout(() => avatar.style.transform = 'scale(1)', 300);
+
+                statusFloat.innerText = '-80% Терпение!';
+                statusFloat.style.color = 'var(--danger)';
+                statusFloat.classList.add('show');
             }
+
+            setTimeout(() => statusFloat.classList.remove('show'), 1200);
 
             title.innerText = choice.feedbackTitle[lang];
             desc.innerText = choice.feedbackDesc[lang];
@@ -888,12 +743,10 @@
 
         function nextScenario() {
             document.getElementById('feedback-modal').style.display = 'none';
-            document.getElementById('patient-avatar').classList.remove('walk-in');
-            
             currentStep++;
 
             if (currentStep < scenarios.length) {
-                setTimeout(loadScenario, 400); 
+                loadScenario(); 
             } else {
                 finishTraining();
             }
@@ -906,7 +759,7 @@
             const scoreDisplay = document.getElementById('final-score-display');
             scoreDisplay.innerText = `${score}/${scenarios.length}`;
             
-            if (score >= 12) {
+            if (score >= 13) {
                 scoreDisplay.style.background = 'var(--success)';
             } else {
                 scoreDisplay.style.background = 'var(--danger)';
